@@ -1,0 +1,27 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: df0cafe41d1110f4386fc5f76afc84e7, type: 3}
+  m_Name: Dummy_Slow
+  m_EditorClassIdentifier: 
+  casingPF: {fileID: 0}
+  tracerPF: {fileID: 2367703441608668311, guid: 0d75de06b37aff88e8a741d4b3cd4b7d,
+    type: 3}
+  speed: 50
+  damage: 25
+  canRicochet: 0
+  maxRicochetAngle: 0
+  ricochetThreshold: 0
+  ricochetDamping: 0
+  penetration: 0
+  showDebugTracers: 0
+  debugTracerTime: 1
+  debugTracerColor: {r: 1, g: 1, b: 1, a: 1}
