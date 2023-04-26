@@ -15,6 +15,8 @@ public class Projectile {
     private Vector3 lastPosition;
     private Vector3 velocity;
 
+    private float deathTimer;
+
     /// <param name="data">Settings for the projectile</param>
     /// <param name="position">Position to spawn the projectile at</param>
     /// <param name="direction">The direction the projectile starts in</param>
@@ -31,7 +33,16 @@ public class Projectile {
     // todo: KYS
     /// <param name="destroyProjectile">Whether the projectile should be destroyed this frame</param>
     public void UpdateProjectile(out bool destroyProjectile) {
+
+
         destroyProjectile = false;
+
+        if(deathTimer > 10) {
+            destroyProjectile = true;
+        }
+
+        deathTimer += 0.02f;
+
         lastPosition = position;
 
         // Apply forces

@@ -4,12 +4,16 @@ using Fusion;
 
 public class ProjectileManager : NetworkBehaviour {
 	[SerializeField] private ProjectileData[] projectiles;
+	public ProjectileData[] projectileDataTypesEditor;
 	public static ProjectileData[] serializedProjectiles;
+	public static ProjectileData[] projectileDataTypes;
 	private static List<Projectile> activeProjectiles = new();
 	private static Queue<GameObject> tracers = new();
 
+
 	private void Awake() {
 		serializedProjectiles = projectiles;
+		projectileDataTypes = projectileDataTypesEditor;
 	}
 
 	public override void FixedUpdateNetwork() {
@@ -24,7 +28,8 @@ public class ProjectileManager : NetworkBehaviour {
 		}
 	}
 
-	public static void CreateProjectile(Projectile projectile) {
+	public static void CreateProjectile(Vector3 position, Vector3 direction, int projectileDataID, NetworkRunner runner) {
+		Projectile projectile = new Projectile(runner, projectileDataTypes[projectileDataID], position, direction);
 		activeProjectiles.Add(projectile);
 		if (tracers.TryPeek(out GameObject _)) {
 			var trac = tracers.Dequeue();

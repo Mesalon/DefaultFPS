@@ -20,7 +20,7 @@ public class Firearm : NetworkBehaviour {
     [SerializeField] private AudioClip fireSound;
     [SerializeField] private AudioClip reloadSound;
 
-    [SerializeField] private ProjectileData boolet;
+    [SerializeField] private int projectileDataKey;
     [SerializeField] private GameObject tracer;
     
     [Header("Settings")]
@@ -77,7 +77,7 @@ public class Firearm : NetworkBehaviour {
                 owner.currentRotRecoil += rs.rotRecoil;
                 Ammo--;
             }
-            ProjectileManager.CreateProjectile(new(Runner, boolet, muzzle.position, muzzle.forward));
+            ProjectileManager.CreateProjectile(muzzle.position, muzzle.forward, projectileDataKey, Runner);
         }
     }
 

@@ -875,7 +875,7 @@ MonoBehaviour:
   muzzle: {fileID: 9085838626089423949}
   fireSound: {fileID: 8300000, guid: 72388a84fdb44201d839278ed99bb232, type: 3}
   reloadSound: {fileID: 8300000, guid: 467b69f2afb7edd17bd6c4162d7d5df1, type: 3}
-  boolet: {fileID: 11400000, guid: e0d966d666c3b518694eee34d741385b, type: 2}
+  projectileDataKey: 0
   tracer: {fileID: 2367703441608668311, guid: 0d75de06b37aff88e8a741d4b3cd4b7d, type: 3}
   aimPoint: {fileID: 6954393838810369148}
   aimTime: 0.1
