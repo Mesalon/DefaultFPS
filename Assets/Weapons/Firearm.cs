@@ -58,7 +58,7 @@ public class Firearm : NetworkBehaviour {
         owner = transform.root.GetComponent<Player>();
         audio = GetComponent<AudioSource>();
         
-        ProjectileManager.PoolTracers(tracer, 30);
+        //ProjectileManager.PoolTracers(tracer, 30);
     }
 
     public override void Spawned() {

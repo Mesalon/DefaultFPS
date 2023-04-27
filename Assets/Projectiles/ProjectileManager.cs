@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
@@ -5,14 +6,12 @@ using Fusion;
 public class ProjectileManager : NetworkBehaviour {
 	[SerializeField] private ProjectileData[] projectiles;
 	public ProjectileData[] projectileDataTypesEditor;
-	public static ProjectileData[] serializedProjectiles;
 	public static ProjectileData[] projectileDataTypes;
 	private static List<Projectile> activeProjectiles = new();
 	private static Queue<GameObject> tracers = new();
 
 
 	private void Awake() {
-		serializedProjectiles = projectiles;
 		projectileDataTypes = projectileDataTypesEditor;
 	}
 
@@ -20,18 +19,25 @@ public class ProjectileManager : NetworkBehaviour {
 		for(int i = activeProjectiles.Count - 1; i >= 0; i--) { // Count backwards as to not make the gods angry
 			activeProjectiles[i].UpdateProjectile(out bool destroyProjectile);
 			if (destroyProjectile) {
-				GameObject go = activeProjectiles[i].tracer;
+				/*GameObject go = activeProjectiles[i].tracer;
 				go.SetActive(false);
-				tracers.Enqueue(go);
+				tracers.Enqueue(go);*/
 				activeProjectiles.RemoveAt(i);
 			}
+		}
+	}
+
+	private void Update() {
+		print(activeProjectiles.Count);
+		for (int i = 0; i < activeProjectiles.Count; i++) {
+			activeProjectiles[i].DrawProjectile();
 		}
 	}
 
 	public static void CreateProjectile(Vector3 position, Vector3 direction, int projectileDataID, NetworkRunner runner) {
 		Projectile projectile = new Projectile(runner, projectileDataTypes[projectileDataID], position, direction);
 		activeProjectiles.Add(projectile);
-		if (tracers.TryPeek(out GameObject _)) {
+		/*if (tracers.TryPeek(out GameObject _)) {
 			var trac = tracers.Dequeue();
 			projectile.tracer = trac;
 			projectile.tracer.SetActive(true);
@@ -39,7 +45,7 @@ public class ProjectileManager : NetworkBehaviour {
 		else {
 			Debug.LogWarning($"Tracer for projectile \"{projectile.data.name}\" could not be found in pool and will be instantiated instead.");
 			projectile.tracer = Instantiate(projectile.data.tracerPF);
-		}
+		}*/
 	}
 
 	/// <summary>This method is run by the class responsible for creating the projectile (i.e. the gun, magazine in VR, etc).</summary>

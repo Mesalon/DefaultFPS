@@ -14,6 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   casingPF: {fileID: 0}
   tracerPF: {fileID: 0}
+  tracerMat: {fileID: 2100000, guid: 107849f836d21060abcfe6780bec1305, type: 2}
+  tracerMesh: {fileID: 4300000, guid: 3eb0c8c8f87208765a50527cf0b6c999, type: 2}
   speed: 285
   damage: 24
   canRicochet: 0

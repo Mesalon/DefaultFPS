@@ -15,7 +15,9 @@ MonoBehaviour:
   casingPF: {fileID: 0}
   tracerPF: {fileID: 2367703441608668311, guid: 0d75de06b37aff88e8a741d4b3cd4b7d,
     type: 3}
-  speed: 50
+  tracerMat: {fileID: 2100000, guid: 107849f836d21060abcfe6780bec1305, type: 2}
+  tracerMesh: {fileID: 4300000, guid: 3eb0c8c8f87208765a50527cf0b6c999, type: 2}
+  speed: 100
   damage: 25
   canRicochet: 0
   maxRicochetAngle: 0

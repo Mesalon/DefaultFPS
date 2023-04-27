@@ -1,21 +1,16 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
-using Unity.VisualScripting.Antlr3.Runtime;
-using UnityEngine.UIElements;
 
 public class Projectile {
     public NetworkRunner runner;
     public PlayerRef owner;
-    public GameObject tracer;
     public readonly ProjectileData data;
 
     private Vector3 position;
     private Vector3 lastPosition;
     private Vector3 velocity;
 
-    private float deathTimer;
+    // todo: Projectile death timer
 
     /// <param name="data">Settings for the projectile</param>
     /// <param name="position">Position to spawn the projectile at</param>
@@ -33,15 +28,7 @@ public class Projectile {
     // todo: KYS
     /// <param name="destroyProjectile">Whether the projectile should be destroyed this frame</param>
     public void UpdateProjectile(out bool destroyProjectile) {
-
-
         destroyProjectile = false;
-
-        if(deathTimer > 10) {
-            destroyProjectile = true;
-        }
-
-        deathTimer += 0.02f;
 
         lastPosition = position;
 
@@ -51,7 +38,6 @@ public class Projectile {
         position += velocity * runner.DeltaTime;
 
         // Tracers
-        tracer.transform.rotation = Quaternion.LookRotation(velocity);
         if (data.showDebugTracers) {
             float time = data.debugTracerTime == 0 ? Time.deltaTime : data.debugTracerTime;
             Color col = Physics.Linecast(lastPosition, position, out _) ? Color.red : data.debugTracerColor;
@@ -83,11 +69,12 @@ public class Projectile {
                 destroyProjectile = true;
             }
         }
-
-        tracer.transform.position = position;
-        tracer.transform.rotation.SetLookRotation((position - lastPosition).normalized);
     }
 
+    public void DrawProjectile() {
+        Graphics.DrawMesh(data.tracerMesh, Matrix4x4.TRS(position, Quaternion.LookRotation(position - lastPosition), Vector3.one * 5), data.tracerMat, 0);
+    }
+    
     private bool CanPenetrate(RaycastHit hit, out Vector3 exitPoint) {
         exitPoint = Vector3.zero;
         return false;

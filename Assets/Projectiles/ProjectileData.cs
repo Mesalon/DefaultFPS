@@ -2,8 +2,8 @@ using UnityEngine;
 
 [CreateAssetMenu(fileName = "New Projectile", menuName = "Items/New Projectile")]
 public class ProjectileData : ScriptableObject {
-	public GameObject casingPF;
-	public GameObject tracerPF;
+	public Mesh tracerMesh;
+	public Material tracerMat;
 	public float speed;
 	public float damage;
 	public bool canRicochet;
