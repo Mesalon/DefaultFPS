@@ -7,7 +7,7 @@ public class ProjectileManager : NetworkBehaviour {
 	[SerializeField] private ProjectileData[] projectiles;
 	public ProjectileData[] projectileDataTypesEditor;
 	public static ProjectileData[] projectileDataTypes;
-	private static List<Projectile> activeProjectiles = new();
+	[Networked] [Capacity(10)] static NetworkLinkedList<Projectile> activeProjectiles => default;
 	private static Queue<GameObject> tracers = new();
 
 
@@ -22,7 +22,7 @@ public class ProjectileManager : NetworkBehaviour {
 				/*GameObject go = activeProjectiles[i].tracer;
 				go.SetActive(false);
 				tracers.Enqueue(go);*/
-				activeProjectiles.RemoveAt(i);
+				activeProjectiles.Remove(activeProjectiles[i]);
 			}
 		}
 	}
