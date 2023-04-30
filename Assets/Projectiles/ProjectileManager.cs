@@ -3,7 +3,10 @@ using Fusion;
 
 public class ProjectileManager : NetworkBehaviour {
 	public static ProjectileManager inst { get; set; }
-	[HardSerialize] public ProjectileData[] projectileLibrary;
+	#if UNITY_EDITOR 
+	[HardSerialize] 
+	#endif 
+	public ProjectileData[] projectileLibrary;
 	[Networked, Capacity(256)] private NetworkArray<Projectile> projectiles { get; }
 	[Networked] private int ProjectileIndex { get; set; }
 

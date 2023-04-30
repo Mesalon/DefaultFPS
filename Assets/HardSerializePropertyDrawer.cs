@@ -1,6 +1,7 @@
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
 [CustomPropertyDrawer(typeof(HardSerializeAttribute))]
 public class HardSerializePropertyDrawer : PropertyDrawer {
     public override void OnGUI(Rect position, SerializedProperty property, GUIContent label) {
@@ -9,3 +10,4 @@ public class HardSerializePropertyDrawer : PropertyDrawer {
         GUI.enabled = true;
     }
 }
+#endif
