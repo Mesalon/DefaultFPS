@@ -15,5 +15,5 @@ public class ProjectileData : ScriptableObject {
 	[Header("Debug Settings")]
 	public bool showDebugTracers;
 	public float debugTracerTime; // Time it shows up. 0 for one frame.
-	public Color debugTracerColor;
+	public Color debugTracerColor = Color.white;
 }

@@ -75,8 +75,8 @@ public class Player : NetworkTransform {
     private void Awake() {
         controls = new();
         cc = GetComponent<CharacterController>();
-        GameObject cam = GameObject.Find("Main Camera");
-        if(cam) cam.SetActive(false);
+        GameObject mainCam = GameObject.Find("Main Camera");
+        if(mainCam) mainCam.SetActive(false);
     }
 
     private void OnInput(NetworkRunner runner, NetworkInput input) {
@@ -105,11 +105,12 @@ public class Player : NetworkTransform {
             name = "Client";
             Cursor.lockState = CursorLockMode.Locked;
             Runner.GetComponent<NetworkEvents>().OnInput.AddListener(OnInput);
-            foreach(GameObject go in localDisabled) { go.SetActive(false); }
+            foreach (GameObject go in localDisabled) { go.GetComponent<Renderer>().enabled = false; }
         }
         else {
             name = "Proxy";
-            foreach(GameObject go in remoteDisabled) { go.SetActive(false); }
+            foreach (GameObject go in remoteDisabled) { go.GetComponent<Renderer>().enabled = false; }
+            cam.gameObject.SetActive(false);
         }
     }
 
@@ -150,70 +151,6 @@ public class Player : NetworkTransform {
 
     public override void Render() {
         if (Object.HasInputAuthority) {
-            Pose gunPoseTarget;
-            float poseTime;
-            float fovTarget, sensTarget, bobSpeedTarget, posBobTarget, rotBobTarget;
-            if (controls.Player.Aim.ReadValue<float>() == 1) {
-                poseTime = weapon.aimTime;
-                gunPoseTarget = inter.aimPose;
-                fovTarget = inter.startFOV / weapon.aimingZoom;
-                sensTarget = sensitivity / weapon.aimingZoom;
-                bobSpeedTarget = inter.aimBobSpeed;
-                posBobTarget = inter.aimPosBob;
-                rotBobTarget = inter.aimRotBob;
-            }
-            else if (controls.Player.Sprint.ReadValue<float>() == 1) {
-                poseTime = weapon.weight;
-                gunPoseTarget = inter.sprintPose;
-                fovTarget = inter.sprintFOV;
-                sensTarget = sensitivity;
-                bobSpeedTarget = inter.sprintBobSpeed;
-                posBobTarget = inter.sprintPosBob;
-                rotBobTarget = inter.sprintRotBob;
-            }
-            else {
-                poseTime = weapon.weight;
-                gunPoseTarget = inter.startPose;
-                fovTarget = inter.startFOV;
-                sensTarget = sensitivity;
-                bobSpeedTarget = inter.startBobSpeed;
-                posBobTarget = inter.startPosBob;
-                rotBobTarget = inter.startRotBob;
-            }
-
-            gunHandle.localPosition = Vector3.SmoothDamp(gunHandle.localPosition, gunPoseTarget.position, ref posVelocity, poseTime);
-            gunHandle.localRotation = SmoothDampRot(gunHandle.localRotation, gunPoseTarget.rotation, ref rotVelocity, poseTime);
-            cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, fovTarget, ref aimVelocity, weapon.weight);
-            currentSensitivity = Mathf.SmoothDamp(currentSensitivity, sensTarget, ref sensVelocity, weapon.weight);
-            inter.bobSpeed = Mathf.SmoothDamp(inter.bobSpeed, bobSpeedTarget, ref bobSpeedVelocity, weapon.weight);
-            inter.posBob = Mathf.SmoothDamp(inter.posBob, posBobTarget, ref posBobVelocity, weapon.weight);
-            inter.rotBob = Mathf.SmoothDamp(inter.rotBob, rotBobTarget, ref rotBobVelocity, weapon.weight);
-
-            Vector3 bobPosTarget = Vector3.zero;
-            Quaternion bobRotTarget = Quaternion.identity;
-            Quaternion lookSwayRot = Quaternion.AngleAxis(-localLook.y * lookSway, Vector3.left) * Quaternion.AngleAxis(localLook.x * lookSway, Vector3.down);
-            if (controls.Player.Move.ReadValue<Vector2>() == default) {
-                bobTime = 0;
-            }
-            else {
-                bobTime += Time.deltaTime * inter.bobSpeed;
-                bobPosTarget = new Vector3(Mathf.Sin(bobTime), -Mathf.Abs(Mathf.Cos(bobTime)), 0) * inter.posBob; // Sin and Cos for circular motion, abs value to simulate bouncing.
-                bobRotTarget = Quaternion.Euler(new Vector3(-Mathf.Abs(Mathf.Sin(bobTime)), Mathf.Cos(bobTime), 0) * inter.rotBob);
-            }
-
-            gunBobHandle.localPosition = Vector3.SmoothDamp(gunBobHandle.localPosition, bobPosTarget, ref gunPosBobVelocity, 0.1f);
-            gunBobHandle.localRotation = SmoothDampRot(gunBobHandle.localRotation, bobRotTarget * lookSwayRot, ref gunRotBobVelocity, 0.1f);
-
-            // Weapon Recoil
-            Vector2 appliedPosRecoil = currentPosRecoil * weapon.rs.posSpeed * Time.deltaTime;
-            Vector2 appliedRotRecoil = currentRotRecoil * weapon.rs.rotSpeed * Time.deltaTime;
-            gunRecoilHandle.localPosition += new Vector3(0, appliedPosRecoil.y, appliedPosRecoil.x);
-            gunRecoilHandle.localRotation *= Quaternion.Euler(appliedRotRecoil.y, appliedRotRecoil.x, 0);
-            gunRecoilHandle.localPosition = Vector3.Slerp(gunRecoilHandle.localPosition, Vector3.zero, weapon.rs.posRecovery);
-            gunRecoilHandle.localRotation = Quaternion.Slerp(gunRecoilHandle.localRotation, Quaternion.identity, weapon.rs.rotRecovery);
-            currentPosRecoil -= appliedPosRecoil;
-            currentRotRecoil -= appliedRotRecoil;
-
             // Camera recoil
             Vector2 appliedRecoil = currentCamRecoil * weapon.rs.camSpeed * Time.deltaTime;
             currentCamRecoil -= appliedRecoil;
@@ -224,10 +161,76 @@ public class Player : NetworkTransform {
             head.localRotation = Quaternion.Euler(Mathf.Clamp(-Look.y - localLook.y, -90, 90), 0, 0);
         }
         else {
-            /*anim.SetFloat("MoveX", LastInput.movement.x, 0.1f, Time.deltaTime);
+            anim.SetFloat("MoveX", LastInput.movement.x, 0.1f, Time.deltaTime);
             anim.SetFloat("MoveZ", LastInput.movement.y, 0.1f, Time.deltaTime);
-            anim.SetFloat("Aim", Input.GetMouseButton(1) ? 1 : 0, 0.1f, Time.deltaTime);*/
+            anim.SetFloat("Aim", LastInput.buttons.IsSet(Buttons.Aim) ? 1 : 0, 0.1f, Time.deltaTime);
+            localLook = LastInput.lookDelta; // For weapon sway
         }
+
+        // Weapon pose
+        Pose gunPoseTarget;
+        float poseTime;
+        float fovTarget, sensTarget, bobSpeedTarget, posBobTarget, rotBobTarget;
+        if (LastInput.buttons.IsSet(Buttons.Aim)) {
+            poseTime = weapon.aimTime;
+            gunPoseTarget = inter.aimPose;
+            fovTarget = inter.startFOV / weapon.aimingZoom;
+            sensTarget = sensitivity / weapon.aimingZoom;
+            bobSpeedTarget = inter.aimBobSpeed;
+            posBobTarget = inter.aimPosBob;
+            rotBobTarget = inter.aimRotBob;
+        }
+        else if (LastInput.buttons.IsSet(Buttons.Sprint)) {
+            poseTime = weapon.weight;
+            gunPoseTarget = inter.sprintPose;
+            fovTarget = inter.sprintFOV;
+            sensTarget = sensitivity;
+            bobSpeedTarget = inter.sprintBobSpeed;
+            posBobTarget = inter.sprintPosBob;
+            rotBobTarget = inter.sprintRotBob;
+        }
+        else {
+            poseTime = weapon.weight;
+            gunPoseTarget = inter.startPose;
+            fovTarget = inter.startFOV;
+            sensTarget = sensitivity;
+            bobSpeedTarget = inter.startBobSpeed;
+            posBobTarget = inter.startPosBob;
+            rotBobTarget = inter.startRotBob;
+        }
+        gunHandle.localPosition = Vector3.SmoothDamp(gunHandle.localPosition, gunPoseTarget.position, ref posVelocity, poseTime);
+        gunHandle.localRotation = SmoothDampRot(gunHandle.localRotation, gunPoseTarget.rotation, ref rotVelocity, poseTime);
+        cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, fovTarget, ref aimVelocity, weapon.weight);
+        currentSensitivity = Mathf.SmoothDamp(currentSensitivity, sensTarget, ref sensVelocity, weapon.weight);
+        inter.bobSpeed = Mathf.SmoothDamp(inter.bobSpeed, bobSpeedTarget, ref bobSpeedVelocity, weapon.weight);
+        inter.posBob = Mathf.SmoothDamp(inter.posBob, posBobTarget, ref posBobVelocity, weapon.weight);
+        inter.rotBob = Mathf.SmoothDamp(inter.rotBob, rotBobTarget, ref rotBobVelocity, weapon.weight);
+
+        // Weapon bob
+        Vector3 bobPosTarget = Vector3.zero;
+        Quaternion bobRotTarget = Quaternion.identity;
+        Quaternion lookSwayRot = Quaternion.AngleAxis(-localLook.y * lookSway, Vector3.left) * Quaternion.AngleAxis(localLook.x * lookSway, Vector3.down);
+        if (LastInput.movement == default) {
+            bobTime = 0;
+        }
+        else {
+            bobTime += Time.deltaTime * inter.bobSpeed;
+            bobPosTarget = new Vector3(Mathf.Sin(bobTime), -Mathf.Abs(Mathf.Cos(bobTime)), 0) * inter.posBob; // Sin and Cos for circular motion, abs value to simulate bouncing.
+            bobRotTarget = Quaternion.Euler(new Vector3(-Mathf.Abs(Mathf.Sin(bobTime)), Mathf.Cos(bobTime), 0) * inter.rotBob);
+        }
+        gunBobHandle.localPosition = Vector3.SmoothDamp(gunBobHandle.localPosition, bobPosTarget, ref gunPosBobVelocity, 0.1f);
+        gunBobHandle.localRotation = SmoothDampRot(gunBobHandle.localRotation, bobRotTarget * lookSwayRot, ref gunRotBobVelocity, 0.1f);
+
+        // Weapon Recoil
+        Vector2 appliedPosRecoil = currentPosRecoil * weapon.rs.posSpeed * Time.deltaTime;
+        Vector2 appliedRotRecoil = currentRotRecoil * weapon.rs.rotSpeed * Time.deltaTime;
+        gunRecoilHandle.localPosition += new Vector3(0, appliedPosRecoil.y, appliedPosRecoil.x);
+        gunRecoilHandle.localRotation *= Quaternion.Euler(appliedRotRecoil.y, appliedRotRecoil.x, 0);
+        gunRecoilHandle.localPosition = Vector3.Slerp(gunRecoilHandle.localPosition, Vector3.zero, weapon.rs.posRecovery);
+        gunRecoilHandle.localRotation = Quaternion.Slerp(gunRecoilHandle.localRotation, Quaternion.identity, weapon.rs.rotRecovery);
+        currentPosRecoil -= appliedPosRecoil;
+        currentRotRecoil -= appliedRotRecoil;
+
     }
 
     protected override void CopyFromBufferToEngine() { // Prevents Unity from doing funky shit when applying values. Required for CC function.

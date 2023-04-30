@@ -31,12 +31,6 @@ public struct Projectile : INetworkStruct {
         Vector3 forces = Physics.gravity;
         velocity += forces * runner.DeltaTime;
         position += velocity * runner.DeltaTime;
-        
-        // Tracers
-        if (data.showDebugTracers) {
-            float time = data.debugTracerTime == 0 ? Time.deltaTime : data.debugTracerTime;
-            Debug.DrawRay(lastPosition, position - lastPosition, data.debugTracerColor, time);
-        }
 
         if (runner.LagCompensation.Raycast(lastPosition, position - lastPosition, Vector3.Distance(position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX)) {
             Debug.Log($"Hit {(hit.GameObject != null ? hit.GameObject.name : "Nothing")}");
@@ -68,7 +62,12 @@ public struct Projectile : INetworkStruct {
 
     public void DrawProjectile() {
         ProjectileData data = ProjectileManager.inst.projectileLibrary[dataIndex];
-        Graphics.DrawMesh(data.tracerMesh, Matrix4x4.TRS(position, Quaternion./*LookRotation(position - lastPosition)*/identity, Vector3.one * 5), data.tracerMat, 0);
+        Graphics.DrawMesh(data.tracerMesh, Matrix4x4.TRS(position, Quaternion.LookRotation(position - lastPosition), Vector3.one * 5), data.tracerMat, 0);
+        
+        if (data.showDebugTracers) {
+            float time = data.debugTracerTime == 0 ? Time.deltaTime : data.debugTracerTime;
+            Debug.DrawRay(lastPosition, position - lastPosition, data.debugTracerColor, time);
+        }
     }
     
     private bool CanPenetrate(RaycastHit hit, out Vector3 exitPoint) {

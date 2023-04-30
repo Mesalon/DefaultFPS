@@ -876,7 +876,6 @@ MonoBehaviour:
   fireSound: {fileID: 8300000, guid: 72388a84fdb44201d839278ed99bb232, type: 3}
   reloadSound: {fileID: 8300000, guid: 467b69f2afb7edd17bd6c4162d7d5df1, type: 3}
   projectileDataKey: 0
-  tracer: {fileID: 2367703441608668311, guid: 0d75de06b37aff88e8a741d4b3cd4b7d, type: 3}
   aimPoint: {fileID: 6954393838810369148}
   aimTime: 0.1
   aimingZoom: 1.25
@@ -891,9 +890,9 @@ MonoBehaviour:
     camRecoil: {x: 0.25, y: 3}
     posRecoil: {x: -0.05, y: 0.01}
     rotRecoil: {x: 2, y: -10}
-  isFullAuto: 0
+  isFullAuto: 1
   reloadTime: 1.5
-  cyclicTime: 1
+  cyclicTime: 0.1
   capacity: 30
   startAmmo: 3000
 --- !u!82 &1925994752573870194

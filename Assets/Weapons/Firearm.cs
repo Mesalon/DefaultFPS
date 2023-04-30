@@ -9,7 +9,7 @@ public class Firearm : NetworkBehaviour {
     [Networked(OnChanged = nameof(ReloadFX))]
     private TickTimer ReloadTimer { get; set; }
 
-    [Networked(OnChanged = nameof(AmmoChange))]
+    //[Networked(OnChanged = nameof(AmmoChange))]
     private int Ammo { get; set; }
 
     [Networked, HideInInspector] public NetworkBool TriggerState { get; set; }
@@ -21,7 +21,6 @@ public class Firearm : NetworkBehaviour {
     [SerializeField] private AudioClip reloadSound;
 
     [SerializeField] private int projectileDataKey;
-    [SerializeField] private GameObject tracer;
     
     [Header("Settings")]
     public Transform aimPoint;
@@ -65,27 +64,22 @@ public class Firearm : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        print($"Trigger: {TriggerState}");
-        print($"Firetimer: {FireTimer.ExpiredOrNotRunning(Runner)}");
-        print($"reload: {ReloadTimer.ExpiredOrNotRunning(Runner)}");
-        print($"Disc: {!DisconnectorState}");
-        print($"ammo: {Ammo > 0}");
-        if (TriggerState && FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0) { // Fire
-            if (!isFullAuto) { DisconnectorState = true; }
-            if (Object.HasInputAuthority) {
-                owner.currentCamRecoil += rs.camRecoil;
-                owner.currentPosRecoil += rs.posRecoil;
-                owner.currentRotRecoil += rs.rotRecoil;
-                Ammo--;
-            }
-            
-            FireTimer = TickTimer.CreateFromSeconds(Runner, cyclicTime);
-            ProjectileManager.inst.CreateProjectile(new(projectileDataKey, new(), muzzle.position, muzzle.forward));
-        }
+        if (TriggerState) { 
+            if (FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0) { // Fire
+                if (!isFullAuto) { DisconnectorState = true; }
+                if (Object.HasInputAuthority) {
+                    owner.currentCamRecoil += rs.camRecoil;
+                    owner.currentPosRecoil += rs.posRecoil;
+                    owner.currentRotRecoil += rs.rotRecoil;
+                }
 
-        if (!TriggerState) {
-            DisconnectorState = false;
+                Ammo--;
+                FireTimer = TickTimer.CreateFromSeconds(Runner, cyclicTime);
+                print($"Creating projectile!!!");
+                ProjectileManager.inst.CreateProjectile(new(projectileDataKey, new(), muzzle.position, muzzle.forward));
+            }
         }
+        else { DisconnectorState = false; }
     }
 
     public void Reload() {
