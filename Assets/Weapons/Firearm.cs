@@ -12,7 +12,7 @@ public class Firearm : NetworkBehaviour {
     [Networked(OnChanged = nameof(AmmoChange))]
     private int Ammo { get; set; }
 
-    [Networked] [HideInInspector] public NetworkBool TriggerState { get; set; }
+    [Networked, HideInInspector] public NetworkBool TriggerState { get; set; }
     [Networked] private int ReserveAmmo { get; set; }
     [Networked] private NetworkBool DisconnectorState { get; set; }
 
@@ -51,14 +51,12 @@ public class Firearm : NetworkBehaviour {
     }
 
     public static void AmmoChange(Changed<Firearm> changed) {
-        /*print($"{changed.Behaviour.Ammo} / {changed.Behaviour.capacity}");*/
+        print($"{changed.Behaviour.Ammo} / {changed.Behaviour.capacity}");
     }
 
     void Awake() {
         owner = transform.root.GetComponent<Player>();
         audio = GetComponent<AudioSource>();
-        
-        //ProjectileManager.PoolTracers(tracer, 30);
     }
 
     public override void Spawned() {
@@ -68,16 +66,22 @@ public class Firearm : NetworkBehaviour {
 
     public override void FixedUpdateNetwork() {
         print(FireTimer.RemainingTime(Runner));
+
         if (TriggerState && FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0) { // Fire
             if (!isFullAuto) { DisconnectorState = true; }
             if (Object.HasInputAuthority) {
-                FireTimer = TickTimer.CreateFromSeconds(Runner, cyclicTime);
                 owner.currentCamRecoil += rs.camRecoil;
                 owner.currentPosRecoil += rs.posRecoil;
                 owner.currentRotRecoil += rs.rotRecoil;
                 Ammo--;
             }
-            ProjectileManager.CreateProjectile(muzzle.position, muzzle.forward, projectileDataKey, Runner);
+            
+            FireTimer = TickTimer.CreateFromSeconds(Runner, cyclicTime);
+            ProjectileManager.inst.CreateProjectile(new(projectileDataKey, new(), muzzle.position, muzzle.forward));
+        }
+
+        if (!TriggerState) {
+            DisconnectorState = false;
         }
     }
 

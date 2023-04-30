@@ -21,7 +21,6 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks {
 
 	public void OnPlayerJoined(NetworkRunner runner, PlayerRef player) {
 		if (runner.IsServer) {
-			print("Player join!");
 			NetworkObject playerObject = runner.Spawn(playerPF, spawns[/*Random.Range(0, spawns.Count - 1)*/0].position, Quaternion.identity, player);
 			characters.Add(player, playerObject);
 		}

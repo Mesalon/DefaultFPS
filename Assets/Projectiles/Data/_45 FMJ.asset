@@ -12,10 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df0cafe41d1110f4386fc5f76afc84e7, type: 3}
   m_Name: _45 FMJ
   m_EditorClassIdentifier: 
-  casingPF: {fileID: 0}
-  tracerPF: {fileID: 0}
-  tracerMat: {fileID: 2100000, guid: 107849f836d21060abcfe6780bec1305, type: 2}
   tracerMesh: {fileID: 4300000, guid: 3eb0c8c8f87208765a50527cf0b6c999, type: 2}
+  tracerMat: {fileID: 2100000, guid: 107849f836d21060abcfe6780bec1305, type: 2}
   speed: 285
   damage: 24
   canRicochet: 0
@@ -23,6 +21,6 @@ MonoBehaviour:
   ricochetThreshold: 0
   ricochetDamping: 0
   penetration: 0
-  showDebugTracers: 0
-  debugTracerTime: 0
-  debugTracerColor: {r: 0, g: 0, b: 0, a: 0}
+  showDebugTracers: 1
+  debugTracerTime: 1
+  debugTracerColor: {r: 1, g: 0, b: 0, a: 1}

@@ -75,6 +75,8 @@ public class Player : NetworkTransform {
     private void Awake() {
         controls = new();
         cc = GetComponent<CharacterController>();
+        GameObject cam = GameObject.Find("Main Camera");
+        if(cam) cam.SetActive(false);
     }
 
     private void OnInput(NetworkRunner runner, NetworkInput input) {
@@ -108,7 +110,6 @@ public class Player : NetworkTransform {
         else {
             name = "Proxy";
             foreach(GameObject go in remoteDisabled) { go.SetActive(false); }
-
         }
     }
 

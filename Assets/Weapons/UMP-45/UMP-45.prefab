@@ -891,9 +891,9 @@ MonoBehaviour:
     camRecoil: {x: 0.25, y: 3}
     posRecoil: {x: -0.05, y: 0.01}
     rotRecoil: {x: 2, y: -10}
-  isFullAuto: 1
+  isFullAuto: 0
   reloadTime: 1.5
-  cyclicTime: 0.1
+  cyclicTime: 1
   capacity: 30
   startAmmo: 3000
 --- !u!82 &1925994752573870194

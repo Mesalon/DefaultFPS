@@ -1513,8 +1513,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1825435815}
   - component: {fileID: 1825435814}
-  - component: {fileID: 1825435816}
   - component: {fileID: 1825435817}
+  - component: {fileID: 1825435816}
   m_Layer: 0
   m_Name: Environment
   m_TagString: Untagged
@@ -1573,24 +1573,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 1825435813}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ab51d26e73f15e1a6af07993d42ca910, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  projectiles: []
-  projectileDataTypesEditor:
-  - {fileID: 11400000, guid: 3d58086aeac60c5c79dd468ca4baa2ca, type: 2}
-  - {fileID: 11400000, guid: 3657f6da511c42b50afe03ab7c5cb3f8, type: 2}
-  - {fileID: 11400000, guid: e0d966d666c3b518694eee34d741385b, type: 2}
---- !u!114 &1825435817
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1825435813}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
   m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
@@ -1601,11 +1583,26 @@ MonoBehaviour:
   AoiPositionSource: {fileID: 0}
   Flags: 2561
   NetworkGuid:
-    RawGuidValue: 3bfdb6a67b724c8891a6bfe82048ac35
+    RawGuidValue: 050e1269d21646968d6d08570d1d66d7
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 1825435816}
+  - {fileID: 1825435817}
   SimulationBehaviours: []
+--- !u!114 &1825435817
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1825435813}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ab51d26e73f15e1a6af07993d42ca910, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  projectileLibrary:
+  - {fileID: 11400000, guid: 3d58086aeac60c5c79dd468ca4baa2ca, type: 2}
 --- !u!1 &1837967855
 GameObject:
   m_ObjectHideFlags: 0
@@ -1764,6 +1761,7 @@ GameObject:
   - component: {fileID: 1964328677}
   - component: {fileID: 1964328680}
   - component: {fileID: 1964328681}
+  - component: {fileID: 1964328682}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1889,6 +1887,18 @@ MonoBehaviour:
     varianceClampScale: 0.9
     contrastAdaptiveSharpening: 0
 --- !u!114 &1964328681
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1964328676}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6de339ddfb37526cab970664879cdc3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1964328682
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
