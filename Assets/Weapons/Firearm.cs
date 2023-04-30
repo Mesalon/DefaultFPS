@@ -65,8 +65,11 @@ public class Firearm : NetworkBehaviour {
     }
 
     public override void FixedUpdateNetwork() {
-        print(FireTimer.RemainingTime(Runner));
-
+        print($"Trigger: {TriggerState}");
+        print($"Firetimer: {FireTimer.ExpiredOrNotRunning(Runner)}");
+        print($"reload: {ReloadTimer.ExpiredOrNotRunning(Runner)}");
+        print($"Disc: {!DisconnectorState}");
+        print($"ammo: {Ammo > 0}");
         if (TriggerState && FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0) { // Fire
             if (!isFullAuto) { DisconnectorState = true; }
             if (Object.HasInputAuthority) {
