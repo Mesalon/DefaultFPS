@@ -6,34 +6,39 @@ public struct Projectile : INetworkStruct {
     public bool isActive;
     private int dataIndex;
     private PlayerRef owner;
-    private Vector3 position;
-    private Vector3 lastPosition;
-    private Vector3 velocity;
+    public Vector3 firePosition { get; }
+    public Vector3 velocity;
+    private Vector3 direction;
+
+    public int FireTick;
+    public int FinishTick;
     // todo: Projectile death timer
 
-    public Projectile(int dataIndex, PlayerRef owner, Vector3 position, Vector3 direction) {
+    public Projectile(int dataIndex, PlayerRef owner, Vector3 position, Vector3 direction, int fireTick, int finishTick, NetworkRunner runner) {
         isActive = true;
         this.dataIndex = dataIndex;
-        this.position = position;
+        this.firePosition = position;
         this.owner = owner;
-        lastPosition = position;
+        this.FireTick = fireTick;
+        this.FinishTick = finishTick;
         velocity = direction * ProjectileManager.inst.projectileLibrary[dataIndex].speed;
+        this.direction = direction;
     }
 
     // todo: Implement fragmentation. Final projectile impacts should choose between ricochet, penetration, and fragmentation.
     // todo: Implement drag and terminal velocity.
     /// <param name="destroyProjectile">Whether the projectile should be destroyed this tick</param>
-    public void UpdateProjectile(NetworkRunner runner, out bool destroyProjectile) {
+    public void UpdateProjectile(NetworkRunner runner, out bool destroyProjectile, int tick) {
+
+        if (FinishTick <= tick) { destroyProjectile = true; return; }
         ProjectileData data = ProjectileManager.inst.projectileLibrary[dataIndex];
         destroyProjectile = false;
-        lastPosition = position;
         // Apply forces
         Vector3 forces = Physics.gravity;
-        velocity += forces * runner.DeltaTime;
-        position += velocity * runner.DeltaTime;
+        var lastPosition = ProjectileManager.inst.GetMovePosition(ref this, tick - 1f);
+        var Position = ProjectileManager.inst.GetMovePosition(ref this, tick);
 
-        if (runner.LagCompensation.Raycast(lastPosition, position - lastPosition, Vector3.Distance(position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX)) {
-            Debug.Log($"Hit {(hit.GameObject != null ? hit.GameObject.name : "Nothing")}");
+        if (runner.LagCompensation.Raycast(lastPosition, Position - lastPosition, Vector3.Distance(Position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX)) {
             if (hit.Hitbox && hit.Hitbox.TryGetComponent(out Player player)) {
                 player.Health -= data.damage;
                 destroyProjectile = true;
@@ -55,19 +60,18 @@ public struct Projectile : INetworkStruct {
 
             else { // If it hit anything else
                 destroyProjectile = true;
-                Debug.Log($"Destroying projectile");
             }
         }
     }
 
-    public void DrawProjectile() {
+    public void DrawProjectile(Vector3 position) {
         ProjectileData data = ProjectileManager.inst.projectileLibrary[dataIndex];
-        Graphics.DrawMesh(data.tracerMesh, Matrix4x4.TRS(position, Quaternion.LookRotation(position - lastPosition), Vector3.one * 5), data.tracerMat, 0);
+        Graphics.DrawMesh(data.tracerMesh, Matrix4x4.TRS(position, Quaternion.LookRotation(direction), Vector3.one * 5), data.tracerMat, 0);
         
-        if (data.showDebugTracers) {
+        /*if (data.showDebugTracers) {
             float time = data.debugTracerTime == 0 ? Time.deltaTime : data.debugTracerTime;
             Debug.DrawRay(lastPosition, position - lastPosition, data.debugTracerColor, time);
-        }
+        }*/
     }
     
     private bool CanPenetrate(RaycastHit hit, out Vector3 exitPoint) {

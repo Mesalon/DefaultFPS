@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using Fusion;
+using TMPro;
 
 public class Firearm : NetworkBehaviour {
     [Networked(OnChanged = nameof(FireFX))]
@@ -10,7 +11,7 @@ public class Firearm : NetworkBehaviour {
     private TickTimer ReloadTimer { get; set; }
 
     //[Networked(OnChanged = nameof(AmmoChange))]
-    private int Ammo { get; set; }
+    [Networked] int Ammo { get; set; }
 
     [Networked, HideInInspector] public NetworkBool TriggerState { get; set; }
     [Networked] private int ReserveAmmo { get; set; }
@@ -39,6 +40,7 @@ public class Firearm : NetworkBehaviour {
     [SerializeField] private float cyclicTime;
     [SerializeField] private int capacity;
     [SerializeField] private int startAmmo;
+    [SerializeField] private TMP_Text ammoCount;
     private Player owner;
     private new AudioSource audio;
 
@@ -63,20 +65,24 @@ public class Firearm : NetworkBehaviour {
         ReserveAmmo = startAmmo;
     }
 
+    public void Update() {
+        ammoCount.text = "Ammo:" + Ammo.ToString();
+    }
     public override void FixedUpdateNetwork() {
         if (TriggerState) { 
-            if (FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0) { // Fire
+            if (FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0 && Runner.IsForward && Runner.IsFirstTick) { // Fire
                 if (!isFullAuto) { DisconnectorState = true; }
                 if (Object.HasInputAuthority) {
                     owner.currentCamRecoil += rs.camRecoil;
                     owner.currentPosRecoil += rs.posRecoil;
                     owner.currentRotRecoil += rs.rotRecoil;
+                    print("gag");
+
                 }
 
                 Ammo--;
                 FireTimer = TickTimer.CreateFromSeconds(Runner, cyclicTime);
-                print($"Creating projectile!!!");
-                ProjectileManager.inst.CreateProjectile(new(projectileDataKey, new(), muzzle.position, muzzle.forward));
+                ProjectileManager.inst.CreateProjectile(new(projectileDataKey, new(), muzzle.position, muzzle.forward, Runner.Tick, Runner.Tick + Mathf.RoundToInt(4f / Runner.DeltaTime), Runner));
             }
         }
         else { DisconnectorState = false; }
@@ -84,7 +90,6 @@ public class Firearm : NetworkBehaviour {
 
     public void Reload() {
         if (ReloadTimer.ExpiredOrNotRunning(Runner) && Ammo < capacity && ReserveAmmo > 0) {
-            print("Reloading . . .");
             ReloadTimer = TickTimer.CreateFromSeconds(Runner, reloadTime);
             int toLoad = Mathf.Clamp(ReserveAmmo, 0, capacity - Ammo);
             ReserveAmmo -= toLoad;
