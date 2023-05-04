@@ -10,17 +10,17 @@ public struct Projectile : INetworkStruct {
     public Vector3 velocity;
     private Vector3 direction;
 
-    public int FireTick;
-    public int FinishTick;
+    public int fireTick;
+    public int finishTick;
     // todo: Projectile death timer
 
     public Projectile(int dataIndex, PlayerRef owner, Vector3 position, Vector3 direction, int fireTick, int finishTick, NetworkRunner runner) {
         isActive = true;
         this.dataIndex = dataIndex;
-        this.firePosition = position;
+        firePosition = position;
         this.owner = owner;
-        this.FireTick = fireTick;
-        this.FinishTick = finishTick;
+        this.fireTick = fireTick;
+        this.finishTick = finishTick;
         velocity = direction * ProjectileManager.inst.projectileLibrary[dataIndex].speed;
         this.direction = direction;
     }
@@ -30,7 +30,7 @@ public struct Projectile : INetworkStruct {
     /// <param name="destroyProjectile">Whether the projectile should be destroyed this tick</param>
     public void UpdateProjectile(NetworkRunner runner, out bool destroyProjectile, int tick) {
 
-        if (FinishTick <= tick) { destroyProjectile = true; return; }
+        if (finishTick <= tick) { destroyProjectile = true; return; }
         ProjectileData data = ProjectileManager.inst.projectileLibrary[dataIndex];
         destroyProjectile = false;
         // Apply forces

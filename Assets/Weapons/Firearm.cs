@@ -10,8 +10,7 @@ public class Firearm : NetworkBehaviour {
     [Networked(OnChanged = nameof(ReloadFX))]
     private TickTimer ReloadTimer { get; set; }
 
-    //[Networked(OnChanged = nameof(AmmoChange))]
-    [Networked] int Ammo { get; set; }
+    [Networked(OnChanged = nameof(AmmoChange))] int Ammo { get; set; }
 
     [Networked, HideInInspector] public NetworkBool TriggerState { get; set; }
     [Networked] private int ReserveAmmo { get; set; }
@@ -52,7 +51,7 @@ public class Firearm : NetworkBehaviour {
     }
 
     public static void AmmoChange(Changed<Firearm> changed) {
-        print($"{changed.Behaviour.Ammo} / {changed.Behaviour.capacity}");
+        changed.Behaviour.ammoCount.text = $"{changed.Behaviour.Ammo} / {changed.Behaviour.ReserveAmmo}";
     }
 
     void Awake() {
@@ -64,22 +63,17 @@ public class Firearm : NetworkBehaviour {
         Ammo = capacity;
         ReserveAmmo = startAmmo;
     }
-
-    public void Update() {
-        ammoCount.text = "Ammo:" + Ammo.ToString();
-    }
+    
     public override void FixedUpdateNetwork() {
         if (TriggerState) { 
-            if (FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0 && Runner.IsForward && Runner.IsFirstTick) { // Fire
+            if (FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0) { // Fire
                 if (!isFullAuto) { DisconnectorState = true; }
                 if (Object.HasInputAuthority) {
                     owner.currentCamRecoil += rs.camRecoil;
                     owner.currentPosRecoil += rs.posRecoil;
                     owner.currentRotRecoil += rs.rotRecoil;
-                    print("gag");
-
+                    print("Bang!");
                 }
-
                 Ammo--;
                 FireTimer = TickTimer.CreateFromSeconds(Runner, cyclicTime);
                 ProjectileManager.inst.CreateProjectile(new(projectileDataKey, new(), muzzle.position, muzzle.forward, Runner.Tick, Runner.Tick + Mathf.RoundToInt(4f / Runner.DeltaTime), Runner));

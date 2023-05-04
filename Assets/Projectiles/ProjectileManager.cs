@@ -42,15 +42,11 @@ public class ProjectileManager : NetworkBehaviour {
 	public void CreateProjectile(Projectile projectile) {
 		projectiles.Set(ProjectileIndex % projectiles.Length, projectile);
 		ProjectileIndex++;
-		print(ProjectileIndex);
 	}
 
 	public Vector3 GetMovePosition(ref Projectile data, float currentTick) {
-		float time = (currentTick - data.FireTick) * Runner.DeltaTime;
-
-		if (time <= 0f)
-			return data.firePosition;
-
+		float time = (currentTick - data.fireTick) * Runner.DeltaTime;
+		if (time <= 0f) { return data.firePosition; }
 		return data.firePosition + data.velocity * time + Physics.gravity * time * time;
 	}
 }

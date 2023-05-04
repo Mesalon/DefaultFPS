@@ -161,9 +161,9 @@ public class Player : NetworkTransform {
             head.localRotation = Quaternion.Euler(Mathf.Clamp(-Look.y - localLook.y, -90, 90), 0, 0);
         }
         else {
-            anim.SetFloat("MoveX", LastInput.movement.x, 0.1f, Time.deltaTime);
+            /*anim.SetFloat("MoveX", LastInput.movement.x, 0.1f, Time.deltaTime);
             anim.SetFloat("MoveZ", LastInput.movement.y, 0.1f, Time.deltaTime);
-            anim.SetFloat("Aim", LastInput.buttons.IsSet(Buttons.Aim) ? 1 : 0, 0.1f, Time.deltaTime);
+            anim.SetFloat("Aim", LastInput.buttons.IsSet(Buttons.Aim) ? 1 : 0, 0.1f, Time.deltaTime);*/
             localLook = LastInput.lookDelta; // For weapon sway
         }
 
