@@ -14,13 +14,13 @@ public struct Projectile : INetworkStruct {
     public int finishTick;
     // todo: Projectile death timer
 
-    public Projectile(int dataIndex, PlayerRef owner, Vector3 position, Vector3 direction, int fireTick, int finishTick, NetworkRunner runner) {
+    public Projectile(int dataIndex, PlayerRef owner, Vector3 position, Vector3 direction, int fireTick, float lifespan, NetworkRunner runner) {
         isActive = true;
         this.dataIndex = dataIndex;
         firePosition = position;
         this.owner = owner;
         this.fireTick = fireTick;
-        this.finishTick = finishTick;
+        finishTick = runner.Tick + Mathf.RoundToInt(lifespan / runner.DeltaTime);
         velocity = direction * ProjectileManager.inst.projectileLibrary[dataIndex].speed;
         this.direction = direction;
     }
