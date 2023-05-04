@@ -64,3 +64,5 @@ crashlytics-build.properties
 
 
 *.dwlt
+
+UserSettings/Layouts/
