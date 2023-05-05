@@ -3,6 +3,8 @@ using Fusion;
 using UnityEngine;
 
 public class ProjectileManager : NetworkBehaviour {
+
+
 	public static ProjectileManager inst { get; set; }
 	#if UNITY_EDITOR 
 	[HardSerialize] 
@@ -19,9 +21,12 @@ public class ProjectileManager : NetworkBehaviour {
 		for (int i = 0; i < projectiles.Length; i++) {
 			Projectile p = projectiles[i];
 			if (p.isActive) {
-				p.UpdateProjectile(Runner, out bool destroyProjectile, tick);
+				p.UpdateProjectile(Runner, out bool destroyProjectile, out Player player, tick);
 				if (destroyProjectile) {
-					print("kaboom");
+                    if (player && Object.HasStateAuthority) {
+						player.Health -= projectileLibrary[p.dataIndex].damage;
+						if(player.Health <= 0) { player.Respawn();}
+                    }
 					p.isActive = false;
 				}
 				projectiles.Set(i, p);
@@ -31,11 +36,9 @@ public class ProjectileManager : NetworkBehaviour {
 
 
 	public override void Render() {
-		float renderTime = Object.IsProxy == true ? Runner.InterpolationRenderTime : Runner.SimulationRenderTime;
-		float floatTick = renderTime / Runner.DeltaTime;
 		for (int i = 0; i < projectiles.Length-1; i++) {
 			Projectile p = projectiles[i];
-			if (p.isActive) { p.DrawProjectile(GetMovePosition(ref p, floatTick)); }
+			if (p.isActive) { p.DrawProjectile(GetMovePosition(ref p, Runner.Tick)); }
 		}
 	}
 

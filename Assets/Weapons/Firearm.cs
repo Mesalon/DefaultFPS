@@ -75,7 +75,6 @@ public class Firearm : NetworkBehaviour {
                     owner.currentCamRecoil += rs.camRecoil;
                     owner.currentPosRecoil += rs.posRecoil;
                     owner.currentRotRecoil += rs.rotRecoil;
-                    print("Bang!");
                 }
             }
         }

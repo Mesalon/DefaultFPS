@@ -10,6 +10,9 @@ public class Player : NetworkTransform {
         }
     }
 
+    [SerializeField] Transform spawnHolder;
+    private List<Transform> spawns = new();
+
     [Networked(OnChanged = nameof(OnHealthChanged))]
     public float Health { get; set; }
     [Networked] private NetworkInputData LastInput { get; set; }
@@ -264,5 +267,12 @@ public class Player : NetworkTransform {
         velocity.w -= velocityError.w;		
 		
         return new Quaternion(Result.x, Result.y, Result.z, Result.w);
+
+    }
+
+    public void Respawn() {
+
+    transform.position = new(0,0,-50);
+        Health = 100;
     }
 }

@@ -4,7 +4,7 @@ using Debug = UnityEngine.Debug;
 
 public struct Projectile : INetworkStruct {
     public bool isActive;
-    private int dataIndex;
+    public int dataIndex;
     private PlayerRef owner;
     public Vector3 firePosition { get; }
     public Vector3 velocity;
@@ -28,8 +28,8 @@ public struct Projectile : INetworkStruct {
     // todo: Implement fragmentation. Final projectile impacts should choose between ricochet, penetration, and fragmentation.
     // todo: Implement drag and terminal velocity.
     /// <param name="destroyProjectile">Whether the projectile should be destroyed this tick</param>
-    public void UpdateProjectile(NetworkRunner runner, out bool destroyProjectile, int tick) {
-
+    public void UpdateProjectile(NetworkRunner runner, out bool destroyProjectile, out Player hitPlayer, int tick) {
+        hitPlayer = null;
         if (finishTick <= tick) { destroyProjectile = true; return; }
         ProjectileData data = ProjectileManager.inst.projectileLibrary[dataIndex];
         destroyProjectile = false;
@@ -39,8 +39,11 @@ public struct Projectile : INetworkStruct {
         var Position = ProjectileManager.inst.GetMovePosition(ref this, tick);
 
         if (runner.LagCompensation.Raycast(lastPosition, Position - lastPosition, Vector3.Distance(Position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX)) {
-            if (hit.Hitbox && hit.Hitbox.TryGetComponent(out Player player)) {
-                player.Health -= data.damage;
+            if (hit.Hitbox) {
+                hit.Hitbox.transform.root.TryGetComponent(out Player player);
+                if (player) {
+                    hitPlayer = player;
+                }
                 destroyProjectile = true;
             }
             
@@ -60,6 +63,7 @@ public struct Projectile : INetworkStruct {
 
             else { // If it hit anything else
                 destroyProjectile = true;
+                Debug.Log("sex");
             }
         }
     }
