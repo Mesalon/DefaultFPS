@@ -22,5 +22,5 @@ MonoBehaviour:
   ricochetDamping: 0
   penetration: 0
   showDebugTracers: 1
-  debugTracerTime: 1
+  debugTracerTime: 0.5
   debugTracerColor: {r: 1, g: 0, b: 0, a: 1}

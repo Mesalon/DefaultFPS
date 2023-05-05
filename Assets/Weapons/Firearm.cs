@@ -69,13 +69,12 @@ public class Firearm : NetworkBehaviour {
             if (FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0) { // Fire
                 Ammo--;
                 FireTimer = TickTimer.CreateFromSeconds(Runner, cyclicTime);
-                ProjectileManager.inst.CreateProjectile(new(projectileDataKey, new(), muzzle.position, muzzle.forward, Runner.Tick, 4, Runner));
+                ProjectileManager.inst.CreateProjectile(new(projectileDataKey, muzzle.position, muzzle.forward, new()));
                 if (!isFullAuto) { DisconnectorState = true; }
                 if (Object.HasInputAuthority && Runner.IsForward) {
                     owner.currentCamRecoil += rs.camRecoil;
                     owner.currentPosRecoil += rs.posRecoil;
                     owner.currentRotRecoil += rs.rotRecoil;
-                    print("Bang!");
                 }
             }
         }
