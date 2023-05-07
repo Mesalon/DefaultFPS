@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using Fusion;
 using TMPro;
+using UnityEngine.VFX;
 
 public class Firearm : NetworkBehaviour {
     [Networked(OnChanged = nameof(FireFX))]
@@ -43,8 +44,13 @@ public class Firearm : NetworkBehaviour {
     private Player owner;
     private new AudioSource audio;
 
+    public GameObject muzzleFlash;
+
     public static void FireFX(Changed<Firearm> changed) {
         changed.Behaviour.audio.PlayOneShot(changed.Behaviour.fireSound);
+        changed.Behaviour.muzzleFlash.GetComponent<VisualEffect>().pause = false;
+        changed.Behaviour.muzzleFlash.GetComponent<VisualEffect>().playRate = 0.01f;
+        changed.Behaviour.muzzleFlash.GetComponent<VisualEffect>().Play();
     }
     public static void ReloadFX(Changed<Firearm> changed) {
         changed.Behaviour.audio.PlayOneShot(changed.Behaviour.reloadSound);

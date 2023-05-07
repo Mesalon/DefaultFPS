@@ -12,11 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df0cafe41d1110f4386fc5f76afc84e7, type: 3}
   m_Name: Dummy_Fast
   m_EditorClassIdentifier: 
-  casingPF: {fileID: 0}
-  tracerPF: {fileID: 2367703441608668311, guid: 0d75de06b37aff88e8a741d4b3cd4b7d,
-    type: 3}
-  tracerMat: {fileID: 0}
   tracerMesh: {fileID: 4300000, guid: 3eb0c8c8f87208765a50527cf0b6c999, type: 2}
+  tracerMat: {fileID: 0}
   speed: 500
   damage: 25
   canRicochet: 0

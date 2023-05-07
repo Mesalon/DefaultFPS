@@ -7,11 +7,13 @@ public struct Projectile : INetworkStruct {
     public int dataIndex;
     private PlayerRef owner;
     public Vector3 firePosition { get; }
-    public Vector3 velocity;
-    private Vector3 direction;
+    //public Vector3 velocity;
+    public Vector3 direction;
 
     public int fireTick;
     public int finishTick;
+
+    public Vector3 hitPosition;
     // todo: Projectile death timer
 
     public Projectile(int dataIndex, PlayerRef owner, Vector3 position, Vector3 direction, int fireTick, float lifespan, NetworkRunner runner) {
@@ -21,8 +23,9 @@ public struct Projectile : INetworkStruct {
         this.owner = owner;
         this.fireTick = fireTick;
         finishTick = runner.Tick + Mathf.RoundToInt(lifespan / runner.DeltaTime);
-        velocity = direction * ProjectileManager.inst.projectileLibrary[dataIndex].speed;
+        //velocity = direction * ProjectileManager.inst.projectileLibrary[dataIndex].speed;
         this.direction = direction;
+        hitPosition = Vector3.zero;
     }
 
     // todo: Implement fragmentation. Final projectile impacts should choose between ricochet, penetration, and fragmentation.
@@ -44,6 +47,7 @@ public struct Projectile : INetworkStruct {
                 if (player) {
                     hitPlayer = player;
                 }
+                hitPosition = hit.Point;
                 destroyProjectile = true;
             }
             
@@ -62,6 +66,7 @@ public struct Projectile : INetworkStruct {
             }*/
 
             else { // If it hit anything else
+                hitPosition = hit.Point;
                 destroyProjectile = true;
                 Debug.Log("sex");
             }

@@ -11,6 +11,7 @@ public class ProjectileData : ScriptableObject {
 	public float ricochetThreshold;
 	public float ricochetDamping;
 	public float penetration;
+	public GameObject impact;
 
 	[Header("Debug Settings")]
 	public bool showDebugTracers;
