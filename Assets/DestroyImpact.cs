@@ -8,6 +8,6 @@ public class DestroyImpact : MonoBehaviour
     public float lifetime;
 
     public void Start() {
-        Destroy(this, lifetime);
+        Destroy(gameObject, lifetime);
     }
 }

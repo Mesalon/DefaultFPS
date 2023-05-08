@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using UnityEngine.UI;
 
 public class Player : NetworkTransform {
     public static void OnHealthChanged(Changed<Player> changed) {
@@ -45,6 +46,7 @@ public class Player : NetworkTransform {
     [Header("Weapon Handling")]
     [HideInInspector] public Vector2 currentCamRecoil, currentPosRecoil, currentRotRecoil;
     [SerializeField] private float lookSway, moveSway;
+    public HealthBar healthSlider;
 
     private float bobTime;
 
@@ -80,6 +82,7 @@ public class Player : NetworkTransform {
         cc = GetComponent<CharacterController>();
         GameObject mainCam = GameObject.Find("Main Camera");
         if(mainCam) mainCam.SetActive(false);
+        healthSlider.SetMaxHealthSlider(100);
     }
 
     private void OnInput(NetworkRunner runner, NetworkInput input) {
@@ -153,6 +156,7 @@ public class Player : NetworkTransform {
     }
 
     public override void Render() {
+        healthSlider.SetHealthSlider(Health);
         if (Object.HasInputAuthority) {
             // Camera recoil
             Vector2 appliedRecoil = currentCamRecoil * weapon.rs.camSpeed * Time.deltaTime;
