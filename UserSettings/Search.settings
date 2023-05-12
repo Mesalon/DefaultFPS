@@ -18,6 +18,9 @@ scopes = {
 	"last_search.74AD8FDB" = "def "
 	"OpenInspectorPreview.74AD8FDB" = "0"
 	"currentGroup.74AD8FDB" = null
+	"last_search.45C55C1A" = ""
+	"OpenInspectorPreview.45C55C1A" = "0"
+	"currentGroup.45C55C1A" = "asset"
 }
 providers = {
 	asset = {

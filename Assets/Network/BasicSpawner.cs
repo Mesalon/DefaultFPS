@@ -4,7 +4,6 @@ using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using Random = UnityEngine.Random;
 
 public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks {
 	[SerializeField] NetworkPrefabRef playerPF;
@@ -36,7 +35,7 @@ public class BasicSpawner : MonoBehaviour, INetworkRunnerCallbacks {
 	public void OnInput(NetworkRunner runner, NetworkInput input) { }
 
 	async void StartGame(GameMode mode) {
-		runner = GetComponent<NetworkRunner>();
+		runner = gameObject.AddComponent<NetworkRunner>();
 		runner.ProvideInput = true;
 		await runner.StartGame(new StartGameArgs {
 			GameMode = mode,
