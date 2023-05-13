@@ -113,7 +113,6 @@ public class Character : NetworkTransform {
             name = "Proxy";
             foreach (GameObject go in remoteInvisible) { go.GetComponent<Renderer>().enabled = false; }
             cam.gameObject.SetActive(false);
-            nametagText.text = player.Name.ToString();
         }
     }
 
@@ -164,6 +163,7 @@ public class Character : NetworkTransform {
         }
         else {
             // Nametags
+            nametagText.text = player.Name.ToString();
             Transform activeCam = GameManager.inst.activeCamera.transform;
             float angle = Vector3.Angle(activeCam.forward, (nametagAimPoint.position - activeCam.position).normalized);
             Color col = nametagText.color; 
