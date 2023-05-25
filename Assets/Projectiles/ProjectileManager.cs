@@ -7,7 +7,7 @@ using System.Linq;
 
 public class ProjectileManager : NetworkBehaviour {
 	public static ProjectileManager inst { get; set; }
-	public ProjectileData[] projectileLibrary;
+	[HideInInspector] public ProjectileData[] projectileLibrary;
 	[Networked, Capacity(256)] private NetworkArray<Projectile> projectiles { get; }
 	[Networked] private int ProjectileIndex { get; set; }
 

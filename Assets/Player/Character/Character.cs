@@ -132,8 +132,8 @@ public class Character : NetworkTransform {
             if (input.buttons.IsSet(Buttons.Aim)) { CurrentMoveSpeed = weapon.aimMoveSpeed; }
             else if (input.buttons.IsSet(Buttons.Run)) { CurrentMoveSpeed = lerp.sprintMoveSpeed; }
             else { CurrentMoveSpeed = moveSpeed; }
-            
-            IsGrounded = Physics.CheckSphere(groundCheck.position, 0.15f, groundLayer);
+
+            IsGrounded = true; //Physics.CheckSphere(groundCheck.position, 0.15f, groundLayer);
             Look = new(Look.x + input.lookDelta.x, Mathf.Clamp(Look.y + input.lookDelta.y, -90, 90));
 
             Vector3 previousPos = transform.position;
