@@ -2,7 +2,7 @@ using Fusion;
 using UnityEngine;
 
 enum Buttons {
-	Sprint, Jump, Fire, Aim, Reload,
+	Run, Jump, Fire, Aim, Reload,
 }
 
 public struct NetworkInputData : INetworkInput {
