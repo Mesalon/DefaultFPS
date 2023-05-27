@@ -20,6 +20,10 @@ public class ProjectileManager : NetworkBehaviour {
 		projectileLibrary = Resources.LoadAll("ProjectileData").OfType<ProjectileData>().ToArray();
 	}
 
+	public override void Spawned() {
+		print("Whtf");
+	}
+
 	public override void FixedUpdateNetwork() {
 		for (int i = 0; i < projectiles.Length; i++) {
 			Projectile p = projectiles[i];

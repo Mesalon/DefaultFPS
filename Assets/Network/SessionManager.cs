@@ -5,16 +5,18 @@ public class SessionManager : MonoBehaviour {
 	private NetworkRunner runner;
 	private GameManager game;
 
-	private async void StartGame(GameMode mode) {
+	private void Awake() {
 		runner = GetComponent<NetworkRunner>();
 		runner.ProvideInput = true;
+	}
+
+	private async void StartGame(GameMode mode) {
 		await runner.StartGame(new StartGameArgs {
 			GameMode = mode,
 			SessionName = "Furry Fandom (LGBTQ+): Hangout & RP",
 			Scene = 1,
 			SceneManager = GetComponent<SceneLoader>()
 		});
-		
 	}
 
 	public void StartGameHook(int mode) {

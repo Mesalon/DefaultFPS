@@ -14,7 +14,6 @@ public class Player : NetworkBehaviour {
 
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_SpawnCharacter(Vector3 position, PlayerRef player) {
-        print("called");
         if (character) {
             Debug.LogError("Attempted to spawn character when not dead yet! Killing . . .");
             character.Kill();

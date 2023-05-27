@@ -15,7 +15,6 @@ public struct Projectile : INetworkStruct {
     public int finishTick;
 
     public Vector3 hitPosition;
-    // todo: Projectile death timer
 
     public Projectile(int dataIndex, PlayerRef owner, Vector3 position, Vector3 direction, int fireTick, float lifespan, NetworkRunner runner) {
         isActive = true;

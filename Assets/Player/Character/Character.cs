@@ -31,12 +31,12 @@ public class Character : NetworkTransform {
     [SerializeField] Transform nametagAimPoint;
     [SerializeField] LayerMask groundLayer;
     [SerializeField] int FPSCap = -1;
-    [SerializeField] int fpsAverageDepth;
     [SerializeField] float sensitivity;
     [SerializeField] float moveSpeed;
     [SerializeField] float jumpForce;
     [SerializeField] float gravity;
     [SerializeField] float lookSway, moveSway;
+    [SerializeField] private float fpsAverageDepth;
     [Header("Kinematics")]
     [SerializeField] Transform abdomen;
     [SerializeField] Transform chest, head;
@@ -48,6 +48,7 @@ public class Character : NetworkTransform {
     private float bobTime;
     private float currentSensitivity;
     private Quaternion startAbdomenRot, startChestRot, startHeadRot;
+    private Pose gunHandlePose, gunRecoilPose, gunBobPose;
 
     [Serializable] private class WeaponInterpolations {
         [HideInInspector] public Pose startPose, sprintPose, aimPose;
@@ -133,7 +134,7 @@ public class Character : NetworkTransform {
             else if (input.buttons.IsSet(Buttons.Run)) { CurrentMoveSpeed = lerp.sprintMoveSpeed; }
             else { CurrentMoveSpeed = moveSpeed; }
 
-            IsGrounded = true; //Physics.CheckSphere(groundCheck.position, 0.15f, groundLayer);
+            IsGrounded = Physics.CheckSphere(groundCheck.position, 0.15f, groundLayer);
             Look = new(Look.x + input.lookDelta.x, Mathf.Clamp(Look.y + input.lookDelta.y, -90, 90));
 
             Vector3 previousPos = transform.position;
@@ -197,12 +198,12 @@ public class Character : NetworkTransform {
             nametagText.transform.position = point;
         }
 
-        Pose gunPoseTarget;
+        Pose gunTargetPose;
         float poseTime;
         float fovTarget, sensTarget, bobSpeedTarget, posBobTarget, rotBobTarget;
         if (LastInput.buttons.IsSet(Buttons.Aim)) {
             poseTime = weapon.aimTime;
-            gunPoseTarget = lerp.aimPose;
+            gunTargetPose = lerp.aimPose;
             fovTarget = lerp.startFOV / weapon.aimingZoom;
             sensTarget = sensitivity / weapon.aimingZoom;
             bobSpeedTarget = lerp.aimBobSpeed;
@@ -211,7 +212,7 @@ public class Character : NetworkTransform {
         }
         else if (LastInput.buttons.IsSet(Buttons.Run)) {
             poseTime = weapon.weight;
-            gunPoseTarget = lerp.sprintPose;
+            gunTargetPose = lerp.sprintPose;
             fovTarget = lerp.sprintFOV;
             sensTarget = sensitivity;
             bobSpeedTarget = lerp.sprintBobSpeed;
@@ -220,43 +221,56 @@ public class Character : NetworkTransform {
         }
         else {
             poseTime = weapon.weight;
-            gunPoseTarget = lerp.startPose;
+            gunTargetPose = lerp.startPose;
             fovTarget = lerp.startFOV;
             sensTarget = sensitivity;
             bobSpeedTarget = lerp.startBobSpeed;
             posBobTarget = lerp.startPosBob;
             rotBobTarget = lerp.startRotBob;
         }
-        gunHandle.localPosition = Vector3.SmoothDamp(gunHandle.localPosition, gunPoseTarget.position, ref posVelocity, poseTime);
+        /*gunHandle.localPosition = Vector3.SmoothDamp(gunHandle.localPosition, gunPoseTarget.position, ref posVelocity, poseTime);
         gunHandle.localRotation = SmoothDampRot(gunHandle.localRotation, gunPoseTarget.rotation, ref rotVelocity, poseTime);
         cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, fovTarget, ref aimVelocity, weapon.weight);
         currentSensitivity = Mathf.SmoothDamp(currentSensitivity, sensTarget, ref sensVelocity, weapon.weight);
         lerp.bobSpeed = Mathf.SmoothDamp(lerp.bobSpeed, bobSpeedTarget, ref bobSpeedVelocity, weapon.weight);
         lerp.posBob = Mathf.SmoothDamp(lerp.posBob, posBobTarget, ref posBobVelocity, weapon.weight);
-        lerp.rotBob = Mathf.SmoothDamp(lerp.rotBob, rotBobTarget, ref rotBobVelocity, weapon.weight);
+        lerp.rotBob = Mathf.SmoothDamp(lerp.rotBob, rotBobTarget, ref rotBobVelocity, weapon.weight);*/
 
+        currentSensitivity = Mathf.SmoothDamp(currentSensitivity, sensTarget, ref sensVelocity, weapon.weight);
+        cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, fovTarget, ref aimVelocity, weapon.weight);
+        lerp.bobSpeed = Mathf.SmoothDamp(lerp.bobSpeed, bobSpeedTarget, ref bobSpeedVelocity, weapon.weight);
+        lerp.posBob = Mathf.SmoothDamp(lerp.posBob, posBobTarget, ref posBobVelocity, weapon.weight);
+        lerp.rotBob = Mathf.SmoothDamp(lerp.rotBob, rotBobTarget, ref rotBobVelocity, weapon.weight);
+        gunHandlePose.position = Vector3.SmoothDamp(gunHandlePose.position, gunTargetPose.position, ref posVelocity, poseTime);
+        gunHandlePose.rotation = SmoothDampRot(gunHandlePose.rotation, gunTargetPose.rotation, ref rotVelocity, poseTime);
+        print($"Moving to {gunTargetPose.position}");
         // Weapon bob
         Vector3 bobPosTarget = Vector3.zero;
         Quaternion bobRotTarget = Quaternion.identity;
         Quaternion lookSwayRot = Quaternion.AngleAxis(-LastInput.lookDelta.y * lookSway, Vector3.left) * Quaternion.AngleAxis(LastInput.lookDelta.x * lookSway, Vector3.down);
-        if (LastInput.movement == default) { bobTime = 0; }
+        if (LastInput.movement == Vector2.zero) { bobTime = 0; }
         else {
             bobTime += Time.deltaTime * lerp.bobSpeed;
             bobPosTarget = new Vector3(Mathf.Sin(bobTime), -Mathf.Abs(Mathf.Cos(bobTime)), 0) * lerp.posBob; // Sin and Cos for circular motion, abs value to simulate bouncing.
             bobRotTarget = Quaternion.Euler(new Vector3(-Mathf.Abs(Mathf.Sin(bobTime)), Mathf.Cos(bobTime), 0) * lerp.rotBob);
         }
-        gunBobHandle.localPosition = Vector3.SmoothDamp(gunBobHandle.localPosition, bobPosTarget, ref gunPosBobVelocity, 0.1f);
-        gunBobHandle.localRotation = SmoothDampRot(gunBobHandle.localRotation, bobRotTarget * lookSwayRot, ref gunRotBobVelocity, 0.1f);
+        
+        gunBobPose.position = Vector3.SmoothDamp(gunBobPose.position, bobPosTarget, ref gunPosBobVelocity, 0.1f);
+        gunBobPose.rotation = SmoothDampRot(gunBobPose.rotation, bobRotTarget * lookSwayRot, ref gunRotBobVelocity, 0.1f);
 
         // Weapon Recoil
         Vector2 appliedPosRecoil = currentPosRecoil * weapon.rs.posSpeed * Time.deltaTime;
         Vector2 appliedRotRecoil = currentRotRecoil * weapon.rs.rotSpeed * Time.deltaTime;
-        gunRecoilHandle.localPosition += new Vector3(0, appliedPosRecoil.y, appliedPosRecoil.x);
-        gunRecoilHandle.localRotation *= Quaternion.Euler(appliedRotRecoil.y, appliedRotRecoil.x, 0);
-        gunRecoilHandle.localPosition = Vector3.Slerp(gunRecoilHandle.localPosition, Vector3.zero, weapon.rs.posRecovery * Time.deltaTime);
-        gunRecoilHandle.localRotation = Quaternion.Slerp(gunRecoilHandle.localRotation, Quaternion.identity, weapon.rs.rotRecovery * Time.deltaTime);
+        gunRecoilPose.position += new Vector3(0, appliedPosRecoil.y, appliedPosRecoil.x);
+        gunRecoilPose.rotation *= Quaternion.Euler(appliedRotRecoil.y, appliedRotRecoil.x, 0);
+        gunRecoilPose.position = Vector3.Slerp(gunRecoilPose.position, Vector3.zero, weapon.rs.posRecovery * Time.deltaTime);
+        gunRecoilPose.rotation = Quaternion.Slerp(gunRecoilPose.rotation, Quaternion.identity, weapon.rs.rotRecovery * Time.deltaTime);
         currentPosRecoil -= appliedPosRecoil;
         currentRotRecoil -= appliedRotRecoil;
+
+        print(gunHandlePose.position);
+        gunHandle.localPosition = gunHandlePose.position + gunRecoilPose.position + gunBobPose.position;
+        gunHandle.localRotation = gunHandlePose.rotation * gunRecoilPose.rotation * gunBobPose.rotation;
         
         // IK
         armIKL.InvertKinematics();
