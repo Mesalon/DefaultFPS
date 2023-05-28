@@ -26,7 +26,7 @@ public class ProjectileManager : NetworkBehaviour {
 			Projectile p = projectiles[i];
 			if (p.isActive) {
 				p.UpdateProjectile(out bool destroyProjectile);
-				if (destroyProjectile) {
+				if (destroyProjectile && Runner.IsFirstTick && Runner.IsForward) {
 					p.isActive = false;
 					Instantiate(ImpactEffect, p.hitPosition, Quaternion.identity).GetComponent<VisualEffect>().Play();
 				}
