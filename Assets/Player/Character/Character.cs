@@ -5,7 +5,7 @@ using Fusion;
 using TMPro;
 
 public class Character : NetworkTransform {
-    [Networked] public float Health { get; set; }
+    [Networked(OnChanged = nameof(OnHealthChanged))] public float Health { get; set; }
     [Networked] NetworkInputData LastInput { get; set; }
     [Networked] bool IsGrounded { get; set; }
     [Networked] Vector3 Velocity { get; set; }
@@ -35,6 +35,7 @@ public class Character : NetworkTransform {
     [SerializeField] float gravity;
     [SerializeField] float lookSway, moveSway;
     [SerializeField] private float fpsAverageDepth;
+    [SerializeField] private HealthBar healthBar;
     [Header("Kinematics")]
     [SerializeField] Transform abdomen;
     [SerializeField] Transform chest, head;
@@ -70,12 +71,17 @@ public class Character : NetworkTransform {
     private float rotBobVelocity;
     
     private Controls controls;
+
     private void Awake() {
         controls = new();
         cc = GetComponent<CharacterController>();
     }
     private new void OnEnable() { controls.Enable(); }
     private void OnDisable() { controls.Disable(); }
+
+    public static void OnHealthChanged(Changed<Character> changed) {
+        changed.Behaviour.healthBar.SetHealthSlider(changed.Behaviour.Health);
+    }
 
     private void OnInput(NetworkRunner runner, NetworkInput input) {
         NetworkInputData data = new();
@@ -122,6 +128,9 @@ public class Character : NetworkTransform {
             foreach (GameObject go in remoteInvisible) { go.GetComponent<Renderer>().enabled = false; }
             cam.gameObject.SetActive(false);
         }
+
+        healthBar.SetMaxHealthSlider(Health);
+        healthBar.SetHealthSlider(Health);
     }
 
     public override void FixedUpdateNetwork() {
@@ -187,7 +196,6 @@ public class Character : NetworkTransform {
             head.RotateAround(head.position, transform.right, finalLook);
             transform.rotation = Quaternion.Euler(0, Look.x + localLook.x, 0);
             
-            healthCounter.text = $"+{Health}";
         }
         else {
             // Nametags
