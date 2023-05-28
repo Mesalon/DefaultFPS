@@ -253,6 +253,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   projectileLibrary: []
+  projectileMask:
+    serializedVersion: 2
+    m_Bits: 251
   ImpactEffect: {fileID: 5506827357751733376, guid: c1e451a420973874388e6bb6690d5f36,
     type: 3}
   impactOffset: {x: 0, y: 0, z: 0}
@@ -448,6 +451,9 @@ MonoBehaviour:
   _interpolationDataSource: 0
   projectileLibrary:
   - {fileID: 11400000, guid: 3d58086aeac60c5c79dd468ca4baa2ca, type: 2}
+  projectileMask:
+    serializedVersion: 2
+    m_Bits: 251
   ImpactEffect: {fileID: 5506827357751733376, guid: c1e451a420973874388e6bb6690d5f36,
     type: 3}
   impactOffset: {x: 0, y: 0.16, z: 0}
