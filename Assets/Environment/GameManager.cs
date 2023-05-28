@@ -15,7 +15,6 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	[SerializeField] private TMP_Text nameText;
 	[SerializeField] private Transform spawnHolder;
 	[SerializeField] private NetworkPrefabRef playerPF;
-	private NetworkRNG rng;
 
 	private void Awake() {
 		if (!inst) { inst = this; }
@@ -26,14 +25,11 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 			LocalPlayer.RPC_SetName(input);
 			nameField.text = "";
 		});
-
-		rng = new(0);
 	}
 
 	public override void Spawned() {
 		Runner.AddCallbacks(this);
 		SwitchCamera(mainCamera);
-		print("Switching");
 	}
 
 	public override void Render() {
@@ -53,15 +49,15 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
 		if (Runner.IsServer) {
 			runner.Despawn(Runner.GetPlayerObject(player));
-			Runner.GetPlayerObject(player).GetComponent<Player>().character.Kill();
+			Character c = Runner.GetPlayerObject(player).GetComponent<Player>().character;
+			if(c) { c.Kill(); }
 			Runner.SetPlayerObject(player, null);
 		}
 		print($"Destroyed player {player}");
 	}
 
 	public void SpawnCharacterHook() {
-		print($"Runner: {Runner}");
-		Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>().RPC_SpawnCharacter(spawns[rng.RangeInclusive(0, spawns.Count)].position, Runner.LocalPlayer);
+		Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>().RPC_SpawnCharacter(spawns[new NetworkRNG(Runner.Tick).RangeInclusive(0, spawns.Count)].position, Runner.LocalPlayer);
 	}
 
 	public void SwitchCamera(Camera cam) {

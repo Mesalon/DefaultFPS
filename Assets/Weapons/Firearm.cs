@@ -1,8 +1,8 @@
 using UnityEngine;
 using System;
+using System.Dynamic;
 using Fusion;
 using TMPro;
-using UnityEngine.Serialization;
 using UnityEngine.VFX;
 
 public class Firearm : NetworkBehaviour {
@@ -14,8 +14,8 @@ public class Firearm : NetworkBehaviour {
     [Networked] private NetworkBool DisconnectorState { get; set; }
 
     [Header("References")]
+    public Transform muzzle;
     [SerializeField] private ProjectileData projectile;
-    [SerializeField] private Transform muzzle;
     [SerializeField] private AudioClip fireSound;
     [SerializeField] private AudioClip reloadSound;
     [SerializeField] private GameObject muzzleFlash;
@@ -76,20 +76,22 @@ public class Firearm : NetworkBehaviour {
     }
     
     public override void FixedUpdateNetwork() {
-        if (TriggerState) { 
-            if (FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0) { // Fire
-                Ammo--;
-                FireTimer = TickTimer.CreateFromSeconds(Runner, cyclicTime);
-                ProjectileManager.inst.CreateProjectile(new(projectileIndex, new(), muzzle.position, muzzle.forward, Runner.Tick, 4, Runner));
-                if (!isFullAuto) { DisconnectorState = true; }
-                if (Runner.IsForward) {
-                    owner.currentCamRecoil += rs.camRecoil;
-                    owner.currentPosRecoil += rs.posRecoil;
-                    owner.currentRotRecoil += rs.rotRecoil;
+        if (GetInput(out NetworkInputData input)) {
+            if (TriggerState) { 
+                if (FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0) { // Fire
+                    Ammo--;
+                    FireTimer = TickTimer.CreateFromSeconds(Runner, cyclicTime);
+                    ProjectileManager.inst.CreateProjectile(new(projectileIndex, new(), input.muzzlePos, input.muzzleDir, Runner.Tick, 4, Runner));
+                    if (!isFullAuto) { DisconnectorState = true; }
+                    if (Runner.IsForward) {
+                        owner.currentCamRecoil += rs.camRecoil;
+                        owner.currentPosRecoil += rs.posRecoil;
+                        owner.currentRotRecoil += rs.rotRecoil;
+                    }
                 }
             }
+            else { DisconnectorState = false; }
         }
-        else { DisconnectorState = false; }
     }
 
     public void Reload() {

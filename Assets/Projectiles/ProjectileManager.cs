@@ -11,17 +11,14 @@ public class ProjectileManager : NetworkBehaviour {
 	[Networked, Capacity(256)] private NetworkArray<Projectile> projectiles { get; }
 	[Networked] private int ProjectileIndex { get; set; }
 
-	Queue<GameObject> impactPool = new();
+	public LayerMask projectileMask;
 	public GameObject ImpactEffect;
 	public Vector3 impactOffset;
+	Queue<GameObject> impactPool = new();
 
 	private void Awake() {
 		inst = this;
 		projectileLibrary = Resources.LoadAll("ProjectileData").OfType<ProjectileData>().ToArray();
-	}
-
-	public override void Spawned() {
-		print("Whtf");
 	}
 
 	public override void FixedUpdateNetwork() {

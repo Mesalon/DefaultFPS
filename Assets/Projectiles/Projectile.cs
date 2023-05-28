@@ -2,7 +2,7 @@ using UnityEngine;
 using Fusion;
 using Debug = UnityEngine.Debug;
 
-public struct Projectile : INetworkStruct {
+public struct  Projectile : INetworkStruct {
     private NetworkRunner Runner => ProjectileManager.inst.Runner;
     public bool isActive;
     public int dataIndex;
@@ -42,18 +42,17 @@ public struct Projectile : INetworkStruct {
         var lastPosition = GetMovePosition(Runner.Tick - 1f);
         var Position = GetMovePosition(Runner.Tick);
 
-        if (Runner.LagCompensation.Raycast(lastPosition, Position - lastPosition, Vector3.Distance(Position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX)) {
+        if (Runner.LagCompensation.Raycast(lastPosition, Position - lastPosition, Vector3.Distance(Position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX, layerMask: ProjectileManager.inst.projectileMask)) {
             hitPosition = hit.Point;
             if (hit.Hitbox) {
                 if (hit.Hitbox.transform.root.TryGetComponent(out Character player)) {
                     player.Health -= ProjectileManager.inst.projectileLibrary[dataIndex].damage;
-                    if (player.Health <= 0) { player.Kill(); }
                 }
                 destroyProjectile = true;
             }
             else { // If it hit anything else
                 destroyProjectile = true;
-            }
+            }   
         }
     }
 

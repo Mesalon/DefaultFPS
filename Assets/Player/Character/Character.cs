@@ -5,7 +5,7 @@ using Fusion;
 using TMPro;
 
 public class Character : NetworkTransform {
-    [Networked(OnChanged = nameof(OnHealthChanged))] public float Health { get; set; }
+    [Networked] public float Health { get; set; }
     [Networked] NetworkInputData LastInput { get; set; }
     [Networked] bool IsGrounded { get; set; }
     [Networked] Vector3 Velocity { get; set; }
@@ -22,8 +22,6 @@ public class Character : NetworkTransform {
     [SerializeField] private Transform armature;
     [SerializeField] Transform groundCheck;
     [SerializeField] Transform gunHandle;
-    [SerializeField] Transform gunRecoilHandle;
-    [SerializeField] Transform gunBobHandle;
     [SerializeField] Transform weaponSprintPose;
     [SerializeField] TMP_Text healthCounter;
     [SerializeField] TMP_Text nametagText;
@@ -79,10 +77,6 @@ public class Character : NetworkTransform {
     private new void OnEnable() { controls.Enable(); }
     private void OnDisable() { controls.Disable(); }
 
-    public static void OnHealthChanged(Changed<Character> changed) {
-        changed.Behaviour.healthCounter.text = $"+{changed.Behaviour.Health}";
-    }
-
     private void OnInput(NetworkRunner runner, NetworkInput input) {
         NetworkInputData data = new();
         data.buttons.Set(Buttons.Run, controls.Player.Sprint.ReadValue<float>() == 1);
@@ -92,6 +86,8 @@ public class Character : NetworkTransform {
         data.buttons.Set(Buttons.Reload, controls.Player.Reload.ReadValue<float>() == 1);
         data.movement = controls.Player.Move.ReadValue<Vector2>();
         data.lookDelta = localLook;
+        data.muzzlePos = weapon.muzzle.position;
+        data.muzzleDir = weapon.muzzle.forward;
         localLook = Vector2.zero; // Consume that mother fucker
         input.Set(data);
     }
@@ -119,6 +115,7 @@ public class Character : NetworkTransform {
             GameManager.inst.SwitchCamera(cam);
             foreach (GameObject go in localInvisible) { go.GetComponent<Renderer>().enabled = false; }
             nametagText.gameObject.SetActive(false);
+            gunHandlePose = new(gunHandle.localPosition, gunHandle.localRotation);
         }
         else {
             name = "Proxy";
@@ -128,7 +125,12 @@ public class Character : NetworkTransform {
     }
 
     public override void FixedUpdateNetwork() {
-        if(Health <= 0) { Kill();}
+        print("Health change");
+        if (Health <= 0) {
+            print("Calling kill");
+            Kill();
+        }
+        
         if (GetInput(out NetworkInputData input)) {
             if (input.buttons.IsSet(Buttons.Aim)) { CurrentMoveSpeed = weapon.aimMoveSpeed; }
             else if (input.buttons.IsSet(Buttons.Run)) { CurrentMoveSpeed = lerp.sprintMoveSpeed; }
@@ -146,7 +148,6 @@ public class Character : NetworkTransform {
             }
             cc.Move(moveVelocity * Runner.DeltaTime);
             Velocity = (transform.position - previousPos) * Runner.Simulation.Config.TickRate;
-            
             // Weapon operation
             weapon.TriggerState = input.buttons.IsSet(Buttons.Fire);
             if (input.buttons.WasPressed(LastInput.buttons, Buttons.Reload)) { weapon.Reload(); }
@@ -185,10 +186,13 @@ public class Character : NetworkTransform {
             chest.RotateAround(chest.position, transform.right, finalLook);
             head.RotateAround(head.position, transform.right, finalLook);
             transform.rotation = Quaternion.Euler(0, Look.x + localLook.x, 0);
+            
+            healthCounter.text = $"+{Health}";
         }
         else {
             // Nametags
             nametagText.text = player.Name.ToString();
+            print($"Activecam: {GameManager.inst.activeCamera}");
             Transform activeCam = GameManager.inst.activeCamera.transform;
             float angle = Vector3.Angle(activeCam.forward, (nametagAimPoint.position - activeCam.position).normalized);
             Color col = nametagText.color; 
@@ -228,14 +232,7 @@ public class Character : NetworkTransform {
             posBobTarget = lerp.startPosBob;
             rotBobTarget = lerp.startRotBob;
         }
-        /*gunHandle.localPosition = Vector3.SmoothDamp(gunHandle.localPosition, gunPoseTarget.position, ref posVelocity, poseTime);
-        gunHandle.localRotation = SmoothDampRot(gunHandle.localRotation, gunPoseTarget.rotation, ref rotVelocity, poseTime);
-        cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, fovTarget, ref aimVelocity, weapon.weight);
-        currentSensitivity = Mathf.SmoothDamp(currentSensitivity, sensTarget, ref sensVelocity, weapon.weight);
-        lerp.bobSpeed = Mathf.SmoothDamp(lerp.bobSpeed, bobSpeedTarget, ref bobSpeedVelocity, weapon.weight);
-        lerp.posBob = Mathf.SmoothDamp(lerp.posBob, posBobTarget, ref posBobVelocity, weapon.weight);
-        lerp.rotBob = Mathf.SmoothDamp(lerp.rotBob, rotBobTarget, ref rotBobVelocity, weapon.weight);*/
-
+        
         currentSensitivity = Mathf.SmoothDamp(currentSensitivity, sensTarget, ref sensVelocity, weapon.weight);
         cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, fovTarget, ref aimVelocity, weapon.weight);
         lerp.bobSpeed = Mathf.SmoothDamp(lerp.bobSpeed, bobSpeedTarget, ref bobSpeedVelocity, weapon.weight);
@@ -243,7 +240,6 @@ public class Character : NetworkTransform {
         lerp.rotBob = Mathf.SmoothDamp(lerp.rotBob, rotBobTarget, ref rotBobVelocity, weapon.weight);
         gunHandlePose.position = Vector3.SmoothDamp(gunHandlePose.position, gunTargetPose.position, ref posVelocity, poseTime);
         gunHandlePose.rotation = SmoothDampRot(gunHandlePose.rotation, gunTargetPose.rotation, ref rotVelocity, poseTime);
-        print($"Moving to {gunTargetPose.position}");
         // Weapon bob
         Vector3 bobPosTarget = Vector3.zero;
         Quaternion bobRotTarget = Quaternion.identity;
@@ -268,7 +264,6 @@ public class Character : NetworkTransform {
         currentPosRecoil -= appliedPosRecoil;
         currentRotRecoil -= appliedRotRecoil;
 
-        print(gunHandlePose.position);
         gunHandle.localPosition = gunHandlePose.position + gunRecoilPose.position + gunBobPose.position;
         gunHandle.localRotation = gunHandlePose.rotation * gunRecoilPose.rotation * gunBobPose.rotation;
         
@@ -288,6 +283,7 @@ public class Character : NetworkTransform {
     public void Kill() {
         print($"Killed player {Object.InputAuthority}");
         if (Object.HasInputAuthority) {
+            print("Switching cam");
             GameManager.inst.SwitchCamera(GameManager.inst.mainCamera);
             Cursor.lockState = CursorLockMode.None;
         }
