@@ -81,7 +81,7 @@ public class Firearm : NetworkBehaviour {
                 if (FireTimer.ExpiredOrNotRunning(Runner) && ReloadTimer.ExpiredOrNotRunning(Runner) && !DisconnectorState && Ammo > 0) { // Fire
                     Ammo--;
                     FireTimer = TickTimer.CreateFromSeconds(Runner, cyclicTime);
-                    ProjectileManager.inst.CreateProjectile(new(projectileIndex, new(), input.muzzlePos, input.muzzleDir, Runner.Tick, 4, Runner));
+                    ProjectileManager.inst.CreateProjectile(new(projectileIndex, Object.InputAuthority, input.muzzlePos, input.muzzleDir, Runner.Tick, 4, Runner));
                     if (!isFullAuto) { DisconnectorState = true; }
                     if (Runner.IsForward) {
                         owner.currentCamRecoil += rs.camRecoil;

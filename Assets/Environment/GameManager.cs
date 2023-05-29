@@ -15,6 +15,7 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	[SerializeField] private TMP_Text nameText;
 	[SerializeField] private Transform spawnHolder;
 	[SerializeField] private NetworkPrefabRef playerPF;
+	
 
 	private void Awake() {
 		if (!inst) { inst = this; }

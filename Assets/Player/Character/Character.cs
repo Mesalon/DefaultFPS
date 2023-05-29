@@ -23,7 +23,7 @@ public class Character : NetworkTransform {
     [SerializeField] Transform groundCheck;
     [SerializeField] Transform gunHandle;
     [SerializeField] Transform weaponSprintPose;
-    [SerializeField] TMP_Text healthCounter;
+    [SerializeField] TMP_Text killIndicator;
     [SerializeField] TMP_Text nametagText;
     [SerializeField] Transform nametagPosition;
     [SerializeField] Transform nametagAimPoint;
@@ -100,6 +100,7 @@ public class Character : NetworkTransform {
     
     public override void Spawned() {
         player = GameManager.inst.LocalPlayer;
+
         print($"Spawned character for player {player.Name}");
         
         lerp.startPose = new(gunHandle.localPosition, gunHandle.localRotation);
@@ -134,7 +135,6 @@ public class Character : NetworkTransform {
     }
 
     public override void FixedUpdateNetwork() {
-        print("Health change");
         if (Health <= 0) {
             print("Calling kill");
             Kill();
@@ -296,6 +296,11 @@ public class Character : NetworkTransform {
             Cursor.lockState = CursorLockMode.None;
         }
         Runner.Despawn(Object);
+    }
+
+    public void EnemyKilled(Character player) {
+        killIndicator.text = $"Killed {player}";
+        killIndicator.gameObject.SetActive(true);
     }
 
     protected override void CopyFromBufferToEngine() { // Prevents Unity from doing funky shit when applying values. Required for CC function.
