@@ -21,7 +21,6 @@ public class Player : NetworkBehaviour {
         if (Runner.IsServer && !character) {
             print("Spawning...");
             character = Runner.Spawn(characterPF, position, Quaternion.identity, player).GetComponent<Character>();
-            
         }
     }
 

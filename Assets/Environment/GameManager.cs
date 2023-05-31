@@ -11,6 +11,7 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	public Camera activeCamera;
 	public static GameManager inst;
 	public static List<Transform> spawns = new();
+
 	[SerializeField] private TMP_InputField nameField;
 	[SerializeField] private TMP_Text nameText;
 	[SerializeField] private Transform spawnHolder;

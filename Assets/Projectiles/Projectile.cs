@@ -48,7 +48,8 @@ public struct  Projectile : INetworkStruct {
                 if (hit.Hitbox.transform.root.TryGetComponent(out Character player)) {
                     player.Health -= ProjectileManager.inst.projectileLibrary[dataIndex].damage;
                     if(player.Health <= 0) {
-                        Runner.GetPlayerObject(owner).GetComponent<Player>().character.EnemyKilled(player);
+                        Debug.Log(Runner.GetPlayerObject(owner).GetComponent<Player>());
+                        Character.playerToCharacter[owner].EnemyKilled(player);
                     }
                 }
                 destroyProjectile = true;

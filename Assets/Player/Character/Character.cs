@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
 using Fusion;
 using TMPro;
@@ -48,6 +49,7 @@ public class Character : NetworkTransform {
     private float currentSensitivity;
     private Quaternion startAbdomenRot, startChestRot, startHeadRot;
     private Pose gunHandlePose, gunRecoilPose, gunBobPose;
+    public static Dictionary<PlayerRef, Character> playerToCharacter = new();
 
     [Serializable] private class WeaponInterpolations {
         [HideInInspector] public Pose startPose, sprintPose, aimPose;
@@ -100,6 +102,7 @@ public class Character : NetworkTransform {
     
     public override void Spawned() {
         player = GameManager.inst.LocalPlayer;
+        playerToCharacter.Add(Object.InputAuthority, this);
 
         print($"Spawned character for player {player.Name}");
         
@@ -289,19 +292,25 @@ public class Character : NetworkTransform {
     }
 
     public void Kill() {
-        print($"Killed player {Object.InputAuthority}");
         if (Object.HasInputAuthority) {
             print("Switching cam");
             GameManager.inst.SwitchCamera(GameManager.inst.mainCamera);
             Cursor.lockState = CursorLockMode.None;
         }
+        playerToCharacter.Remove(Object.InputAuthority);
         Runner.Despawn(Object);
     }
 
     public void EnemyKilled(Character player) {
+        StartCoroutine(KillIndicator());
+    }
+
+    IEnumerator KillIndicator() {
         killIndicator.text = $"Killed {player}";
         killIndicator.gameObject.SetActive(true);
-    }
+        yield return new WaitForSeconds(2);
+        killIndicator.gameObject.SetActive(false);
+    } 
 
     protected override void CopyFromBufferToEngine() { // Prevents Unity from doing funky shit when applying values. Required for CC function.
         cc.enabled = false;
