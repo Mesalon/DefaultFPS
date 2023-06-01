@@ -113,9 +113,9 @@ RectTransform:
   m_LocalScale: {x: 0, y: 0, z: 0}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 1840265196536046053}
   - {fileID: 4467906380376203198}
   - {fileID: 8198833086159628145}
-  - {fileID: 1840265196536046053}
   - {fileID: 8079724354800592199}
   m_Father: {fileID: 3950717414557531611}
   m_RootOrder: -1
@@ -1220,37 +1220,37 @@ MonoBehaviour:
     RotTeleportRadians: 1.5
   UseLegacySharedModeInterpolation: 0
   TargetInterpolationDelay: 0.03
-  _Health: 100
   player: {fileID: 0}
-  showNametagAngle: 4
-  hideNametagAngle: 8
+  attacker: {fileID: 0}
   currentCamRecoil: {x: 0, y: 0}
   currentPosRecoil: {x: 0, y: 0}
   currentRotRecoil: {x: 0, y: 0}
   localInvisible: []
   remoteInvisible: []
-  cam: {fileID: 1873593961976660247}
   weapon: {fileID: 1461163528809478010}
-  armature: {fileID: 0}
   groundCheck: {fileID: 3401456224725798835}
   gunHandle: {fileID: 320078896068158597}
   weaponSprintPose: {fileID: 266448692937990675}
-  killIndicator: {fileID: 720695545177287901}
-  nametagText: {fileID: 4613706785385769492}
-  nametagPosition: {fileID: 7795040133906366147}
-  nametagAimPoint: {fileID: 845707802680128929}
   groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  FPSCap: -1
+  maxHealth: 100
   sensitivity: 0.1
   moveSpeed: 3.5
   jumpForce: 5
   gravity: -14.715
   lookSway: 1
   moveSway: 1
-  fpsAverageDepth: 60
+  FPSCap: -1
+  cam: {fileID: 1873593961976660247}
   healthBar: {fileID: 5870342456573934599}
+  killIndicator: {fileID: 720695545177287901}
+  showNametagAngle: 4
+  hideNametagAngle: 8
+  nametagText: {fileID: 4613706785385769492}
+  nametagPosition: {fileID: 7795040133906366147}
+  nametagAimPoint: {fileID: 845707802680128929}
+  fpsAverageDepth: 60
   abdomen: {fileID: 5304003911758577349}
   chest: {fileID: 8939402052696638201}
   head: {fileID: 6229061859744471449}
@@ -2557,7 +2557,7 @@ GameObject:
   - component: {fileID: 4011561119419519491}
   - component: {fileID: 720695545177287901}
   m_Layer: 5
-  m_Name: Kill Confirmed
+  m_Name: Kill Indicator
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2571,16 +2571,16 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5471243247332553967}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 3706943442135836927}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 0.5}
-  m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 360}
+  m_AnchorMin: {x: 0.5, y: 0}
+  m_AnchorMax: {x: 0.5, y: 0}
+  m_AnchoredPosition: {x: 0, y: 150}
   m_SizeDelta: {x: 200, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4011561119419519491
@@ -2611,7 +2611,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: New Text
+  m_text: 'KILL: ShitFungus69696969'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -2638,14 +2638,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 16
+  m_fontSizeBase: 16
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
+  m_HorizontalAlignment: 2
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0
@@ -2898,7 +2898,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6573404925691941805}
-  m_LocalRotation: {x: -0.11232734, y: 0.28491774, z: -0.3282403, w: 0.89356744}
+  m_LocalRotation: {x: -0.112327345, y: 0.2849178, z: -0.3282404, w: 0.8935674}
   m_LocalPosition: {x: -0.00000012762911, y: 0.2511819, z: 0.0000000011059456}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3033,7 +3033,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6950647482881541857}
-  m_LocalRotation: {x: 0.000000014901158, y: 0.00000047683704, z: 0.50317067, w: 0.86418706}
+  m_LocalRotation: {x: 0.0000001639127, y: 0.00000047683693, z: 0.50317067, w: 0.86418706}
   m_LocalPosition: {x: 0.00000011140342, y: 0.3450217, z: 0.0000000013387762}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -3159,7 +3159,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7027977118214175433}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -3907,7 +3907,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8199715597638759178}
-  m_LocalRotation: {x: -0.49299017, y: 0.5613306, z: 0.6284495, w: -0.21660991}
+  m_LocalRotation: {x: -0.4929901, y: 0.5613307, z: 0.6284496, w: -0.21660995}
   m_LocalPosition: {x: -0.18226296, y: 0.1248387, z: -0.01638956}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0

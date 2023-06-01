@@ -6,10 +6,10 @@ using System;
 using TMPro;
 
 public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
-	public Player LocalPlayer => Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>();
+	public static GameManager inst;
+	public static Player GetPlayer(NetworkRunner runner, PlayerRef player) => runner.GetPlayerObject(player).GetComponent<Player>();
 	public Camera mainCamera;
 	public Camera activeCamera;
-	public static GameManager inst;
 	public static List<Transform> spawns = new();
 
 	[SerializeField] private TMP_InputField nameField;
@@ -17,14 +17,13 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	[SerializeField] private Transform spawnHolder;
 	[SerializeField] private NetworkPrefabRef playerPF;
 	
-
 	private void Awake() {
 		if (!inst) { inst = this; }
 		else if (inst != this) { Destroy(gameObject); }
 		foreach (Transform child in spawnHolder) { spawns.Add(child); }
 		
 		nameField.onSubmit.AddListener(input => {
-			LocalPlayer.RPC_SetName(input);
+			GetPlayer(Runner, Runner.LocalPlayer).RPC_SetName(input);
 			nameField.text = "";
 		});
 	}

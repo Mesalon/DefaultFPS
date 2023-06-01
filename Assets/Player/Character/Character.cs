@@ -6,7 +6,7 @@ using Fusion;
 using TMPro;
 
 public class Character : NetworkTransform {
-    [Networked(OnChanged = nameof(OnHealthChanged))] public float Health { get; set; }
+    [Networked(OnChanged = nameof(OnHealthChanged))] float Health { get; set; }
     [Networked] NetworkInputData LastInput { get; set; }
     [Networked] bool IsGrounded { get; set; }
     [Networked] Vector3 Velocity { get; set; }
@@ -14,42 +14,42 @@ public class Character : NetworkTransform {
     [Networked] float CurrentMoveSpeed { get; set; }
     
     public Player player;
-    [SerializeField] float showNametagAngle, hideNametagAngle;
+    public Player attacker; // Most recent damage source
     [HideInInspector] public Vector2 currentCamRecoil, currentPosRecoil, currentRotRecoil;
     [SerializeField] List<GameObject> localInvisible;
     [SerializeField] List<GameObject> remoteInvisible;
-    [SerializeField] Camera cam;
     [SerializeField] Firearm weapon;
-    [SerializeField] private Transform armature;
     [SerializeField] Transform groundCheck;
     [SerializeField] Transform gunHandle;
     [SerializeField] Transform weaponSprintPose;
-    [SerializeField] TMP_Text killIndicator;
-    [SerializeField] TMP_Text nametagText;
-    [SerializeField] Transform nametagPosition;
-    [SerializeField] Transform nametagAimPoint;
     [SerializeField] LayerMask groundLayer;
-    [SerializeField] int FPSCap = -1;
+    [SerializeField] float maxHealth;
     [SerializeField] float sensitivity;
     [SerializeField] float moveSpeed;
     [SerializeField] float jumpForce;
     [SerializeField] float gravity;
     [SerializeField] float lookSway, moveSway;
-    [SerializeField] private float fpsAverageDepth;
-    [SerializeField] private HealthBar healthBar;
+    [SerializeField] int FPSCap = -1;
+    [Header("UI")]
+    [SerializeField] Camera cam;
+    [SerializeField] HealthBar healthBar;
+    [SerializeField] TMP_Text killIndicator;
+    [SerializeField] float showNametagAngle, hideNametagAngle;
+    [SerializeField] TMP_Text nametagText;
+    [SerializeField] Transform nametagPosition;
+    [SerializeField] Transform nametagAimPoint;
+    [SerializeField] float fpsAverageDepth;
     [Header("Kinematics")]
     [SerializeField] Transform abdomen;
     [SerializeField] Transform chest, head;
     [SerializeField] TwoBoneIK armIKL, armIKR;
     private Queue<float> deltaTimes = new();
     private CharacterController cc;
-    private Vector2 localLook;
-    private float gunBobProgress;
-    private float bobTime;
-    private float currentSensitivity;
     private Quaternion startAbdomenRot, startChestRot, startHeadRot;
     private Pose gunHandlePose, gunRecoilPose, gunBobPose;
-    public static Dictionary<PlayerRef, Character> playerToCharacter = new();
+    private Vector2 localLook;
+    private float currentSensitivity;
+    private float bobClock;
 
     [Serializable] private class WeaponInterpolations {
         [HideInInspector] public Pose startPose, sprintPose, aimPose;
@@ -82,7 +82,20 @@ public class Character : NetworkTransform {
     private void OnDisable() { controls.Disable(); }
 
     public static void OnHealthChanged(Changed<Character> changed) {
-        changed.Behaviour.healthBar.SetHealthSlider(changed.Behaviour.Health);
+        Character c = changed.Behaviour;
+        if (c.Health <= 0) {
+            print($"{c.name} dead! Killer: {c.attacker.Name}");
+            Character atk = c.attacker.character;
+            IEnumerator IndicateKill() {
+                atk.killIndicator.text = $"KILL - {c.attacker.Name}";
+                atk.killIndicator.gameObject.SetActive(true);
+                yield return new WaitForSeconds(1.5f);
+                atk.killIndicator.gameObject.SetActive(false);
+            } 
+            atk.StartCoroutine(IndicateKill());
+            c.Kill();
+        }
+        else { changed.Behaviour.healthBar.SetHealthSlider(c.Health); }
     }
 
     private void OnInput(NetworkRunner runner, NetworkInput input) {
@@ -101,10 +114,11 @@ public class Character : NetworkTransform {
     }
     
     public override void Spawned() {
-        player = GameManager.inst.LocalPlayer;
-        playerToCharacter.Add(Object.InputAuthority, this);
-
+        player = GameManager.GetPlayer(Runner, Object.InputAuthority);
+        player.character = this;
         print($"Spawned character for player {player.Name}");
+
+        Health = maxHealth;
         
         lerp.startPose = new(gunHandle.localPosition, gunHandle.localRotation);
         lerp.sprintPose = new(weaponSprintPose.localPosition, weaponSprintPose.localRotation);
@@ -138,11 +152,6 @@ public class Character : NetworkTransform {
     }
 
     public override void FixedUpdateNetwork() {
-        if (Health <= 0) {
-            print("Calling kill");
-            Kill();
-        }
-        
         if (GetInput(out NetworkInputData input)) {
             if (input.buttons.IsSet(Buttons.Aim)) { CurrentMoveSpeed = weapon.aimMoveSpeed; }
             else if (input.buttons.IsSet(Buttons.Run)) { CurrentMoveSpeed = lerp.sprintMoveSpeed; }
@@ -203,7 +212,6 @@ public class Character : NetworkTransform {
         else {
             // Nametags
             nametagText.text = player.Name.ToString();
-            print($"Activecam: {GameManager.inst.activeCamera}");
             Transform activeCam = GameManager.inst.activeCamera.transform;
             float angle = Vector3.Angle(activeCam.forward, (nametagAimPoint.position - activeCam.position).normalized);
             Color col = nametagText.color; 
@@ -255,11 +263,11 @@ public class Character : NetworkTransform {
         Vector3 bobPosTarget = Vector3.zero;
         Quaternion bobRotTarget = Quaternion.identity;
         Quaternion lookSwayRot = Quaternion.AngleAxis(-LastInput.lookDelta.y * lookSway, Vector3.left) * Quaternion.AngleAxis(LastInput.lookDelta.x * lookSway, Vector3.down);
-        if (LastInput.movement == Vector2.zero) { bobTime = 0; }
+        if (LastInput.movement == Vector2.zero) { bobClock = 0; }
         else {
-            bobTime += Time.deltaTime * lerp.bobSpeed;
-            bobPosTarget = new Vector3(Mathf.Sin(bobTime), -Mathf.Abs(Mathf.Cos(bobTime)), 0) * lerp.posBob; // Sin and Cos for circular motion, abs value to simulate bouncing.
-            bobRotTarget = Quaternion.Euler(new Vector3(-Mathf.Abs(Mathf.Sin(bobTime)), Mathf.Cos(bobTime), 0) * lerp.rotBob);
+            bobClock += Time.deltaTime * lerp.bobSpeed;
+            bobPosTarget = new Vector3(Mathf.Sin(bobClock), -Mathf.Abs(Mathf.Cos(bobClock)), 0) * lerp.posBob; // Sin and Cos for circular motion, abs value to simulate bouncing.
+            bobRotTarget = Quaternion.Euler(new Vector3(-Mathf.Abs(Mathf.Sin(bobClock)), Mathf.Cos(bobClock), 0) * lerp.rotBob);
         }
         
         gunBobPose.position = Vector3.SmoothDamp(gunBobPose.position, bobPosTarget, ref gunPosBobVelocity, 0.1f);
@@ -293,24 +301,16 @@ public class Character : NetworkTransform {
 
     public void Kill() {
         if (Object.HasInputAuthority) {
-            print("Switching cam");
             GameManager.inst.SwitchCamera(GameManager.inst.mainCamera);
             Cursor.lockState = CursorLockMode.None;
         }
-        playerToCharacter.Remove(Object.InputAuthority);
         Runner.Despawn(Object);
     }
 
-    public void EnemyKilled(Character player) {
-        StartCoroutine(KillIndicator());
+    public void Damage(Player source, float amount) { // todo: Implement DamageSource struct with more detailed information like weapon, distance, etc
+        attacker = source;
+        Health = Mathf.Clamp(Health - amount, 0, maxHealth);
     }
-
-    IEnumerator KillIndicator() {
-        killIndicator.text = $"Killed {player}";
-        killIndicator.gameObject.SetActive(true);
-        yield return new WaitForSeconds(2);
-        killIndicator.gameObject.SetActive(false);
-    } 
 
     protected override void CopyFromBufferToEngine() { // Prevents Unity from doing funky shit when applying values. Required for CC function.
         cc.enabled = false;
