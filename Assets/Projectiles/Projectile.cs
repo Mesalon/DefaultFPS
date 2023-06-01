@@ -49,7 +49,7 @@ public struct  Projectile : INetworkStruct {
                     player.Health -= ProjectileManager.inst.projectileLibrary[dataIndex].damage;
                     if(player.Health <= 0) {
                         Debug.Log(Runner.GetPlayerObject(owner).GetComponent<Player>());
-                        Character.playerToCharacter[owner].EnemyKilled(player);
+                        Character.playerToCharacter[owner].EnemyKilled(Character.characterToPlayer[player]);
                     }
                 }
                 destroyProjectile = true;

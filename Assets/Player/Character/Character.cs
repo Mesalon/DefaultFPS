@@ -50,6 +50,7 @@ public class Character : NetworkTransform {
     private Quaternion startAbdomenRot, startChestRot, startHeadRot;
     private Pose gunHandlePose, gunRecoilPose, gunBobPose;
     public static Dictionary<PlayerRef, Character> playerToCharacter = new();
+    public static Dictionary<Character, Player> characterToPlayer = new();
 
     [Serializable] private class WeaponInterpolations {
         [HideInInspector] public Pose startPose, sprintPose, aimPose;
@@ -103,6 +104,7 @@ public class Character : NetworkTransform {
     public override void Spawned() {
         player = GameManager.inst.LocalPlayer;
         playerToCharacter.Add(Object.InputAuthority, this);
+        characterToPlayer.Add(this, Runner.GetPlayerObject(Object.InputAuthority).GetComponent<Player>());
 
         print($"Spawned character for player {player.Name}");
         
@@ -298,15 +300,16 @@ public class Character : NetworkTransform {
             Cursor.lockState = CursorLockMode.None;
         }
         playerToCharacter.Remove(Object.InputAuthority);
+        characterToPlayer.Remove(this);
         Runner.Despawn(Object);
     }
 
-    public void EnemyKilled(Character player) {
-        StartCoroutine(KillIndicator());
+    public void EnemyKilled(Player player) {
+        StartCoroutine(KillIndicator(player));
     }
 
-    IEnumerator KillIndicator() {
-        killIndicator.text = $"Killed {player}";
+    IEnumerator KillIndicator(Player player) {
+        killIndicator.text = $"Killed {player.Name}";
         killIndicator.gameObject.SetActive(true);
         yield return new WaitForSeconds(2);
         killIndicator.gameObject.SetActive(false);
