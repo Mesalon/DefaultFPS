@@ -6,25 +6,29 @@ using System;
 using TMPro;
 
 public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
-	public Player LocalPlayer => Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>();
+	public static GameManager inst;
+	public static Player GetPlayer(NetworkRunner runner, PlayerRef player) => runner.GetPlayerObject(player).GetComponent<Player>();
 	public Camera mainCamera;
 	public Camera activeCamera;
-	public static GameManager inst;
 	public static List<Transform> spawns = new();
 
 	[SerializeField] private TMP_InputField nameField;
 	[SerializeField] private TMP_Text nameText;
 	[SerializeField] private Transform spawnHolder;
 	[SerializeField] private NetworkPrefabRef playerPF;
+	public int redTeamCount;
+	public int blueTeamCount;
+	public int redTeamKills;
+	public int blueTeamKills;
+	public int killsToEndMatch;
 	
-
 	private void Awake() {
 		if (!inst) { inst = this; }
 		else if (inst != this) { Destroy(gameObject); }
 		foreach (Transform child in spawnHolder) { spawns.Add(child); }
 		
 		nameField.onSubmit.AddListener(input => {
-			LocalPlayer.RPC_SetName(input);
+			GetPlayer(Runner, Runner.LocalPlayer).RPC_SetName(input);
 			nameField.text = "";
 		});
 	}
@@ -45,7 +49,6 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 			NetworkObject playerObject = runner.Spawn(playerPF, Vector3.zero, Quaternion.identity, player);
 			Runner.SetPlayerObject(player, playerObject);
 		}
-		print($"Spawned player {player.PlayerId}");
 	}
 
 	public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
@@ -67,7 +70,11 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		cam.gameObject.SetActive(true);
 		activeCamera = cam;
 	}
-	
+
+    public enum Team {
+		Red,
+		Blue
+    }
 	#region stubs
 	public void OnInput(NetworkRunner runner, NetworkInput input) { }
 	public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }

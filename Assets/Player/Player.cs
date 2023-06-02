@@ -6,10 +6,21 @@ public class Player : NetworkBehaviour {
     [Networked] public NetworkString<_32> Name { get; set; }
     [SerializeField] private NetworkPrefabRef characterPF;
     public Character character;
+    public int Kills;
+    public int Deaths;
+    public GameManager.Team team;
 
     public override void Spawned() {
         name = $"Player {Object.InputAuthority.PlayerId}";
         Name = name;
+        if(GameManager.inst.redTeamCount <= GameManager.inst.blueTeamCount) {
+            team = GameManager.Team.Red;
+            GameManager.inst.redTeamCount++;
+        } else {
+            team = GameManager.Team.Blue;
+            GameManager.inst.blueTeamCount++;
+        }
+        print(team);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -20,7 +31,7 @@ public class Player : NetworkBehaviour {
         }
         if (Runner.IsServer && !character) {
             print("Spawning...");
-            character = Runner.Spawn(characterPF, position, Quaternion.identity, player).GetComponent<Character>();
+            Runner.Spawn(characterPF, position, Quaternion.identity, player).GetComponent<Character>();
         }
     }
 

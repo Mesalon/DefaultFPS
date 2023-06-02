@@ -8,7 +8,6 @@ public struct  Projectile : INetworkStruct {
     public int dataIndex;
     private PlayerRef owner;
     public Vector3 firePosition { get; }
-    //public Vector3 velocity;
     public Vector3 direction;
 
     public int fireTick;
@@ -23,7 +22,6 @@ public struct  Projectile : INetworkStruct {
         this.owner = owner;
         this.fireTick = fireTick;
         finishTick = runner.Tick + Mathf.RoundToInt(lifespan / runner.DeltaTime);
-        //velocity = direction * ProjectileManager.inst.projectileLibrary[dataIndex].speed;
         this.direction = direction;
         hitPosition = Vector3.zero;
     }
@@ -45,12 +43,8 @@ public struct  Projectile : INetworkStruct {
         if (Runner.LagCompensation.Raycast(lastPosition, Position - lastPosition, Vector3.Distance(Position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX, layerMask: ProjectileManager.inst.projectileMask)) {
             hitPosition = hit.Point;
             if (hit.Hitbox) {
-                if (hit.Hitbox.transform.root.TryGetComponent(out Character player)) {
-                    player.Health -= ProjectileManager.inst.projectileLibrary[dataIndex].damage;
-                    if(player.Health <= 0) {
-                        Debug.Log(Runner.GetPlayerObject(owner).GetComponent<Player>());
-                        Character.playerToCharacter[owner].EnemyKilled(Character.characterToPlayer[player]);
-                    }
+                if (hit.Hitbox.transform.root.TryGetComponent(out Character hitCharacter)) {
+                    hitCharacter.Damage(GameManager.GetPlayer(Runner, owner), ProjectileManager.inst.projectileLibrary[dataIndex].damage);
                 }
                 destroyProjectile = true;
             }

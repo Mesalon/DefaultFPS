@@ -14,13 +14,11 @@ public class DebugSession : MonoBehaviour {
     }
 
     public async void StartGame() {
-        print("Starting . . .");
         await runner.StartGame(new StartGameArgs {
             GameMode = singlePlayer ? GameMode.Single : GameMode.AutoHostOrClient,
             SessionName = "Debug Room",
             Scene = SceneManager.GetActiveScene().buildIndex,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
-        print($"Debug session started in gamemode {runner.GameMode}");
     }
 }
