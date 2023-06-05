@@ -38,6 +38,7 @@ public class Character : NetworkTransform {
     [SerializeField] HealthBar healthBar;
     [SerializeField] TMP_Text ammoCounter;
     [SerializeField] TMP_Text killIndicator;
+    [SerializeField] TMP_Text healthText;
     [SerializeField] float showNametagAngle, hideNametagAngle;
     [SerializeField] TMP_Text nametagText;
     [SerializeField] Transform nametagPosition;
@@ -96,7 +97,7 @@ public class Character : NetworkTransform {
             atk.player.Kills++;
             c.Kill();
         }
-        else { changed.Behaviour.healthBar.SetHealthSlider(c.Health); }
+        else { c.healthText.text = c.Health.ToString(); }
     }
 
     private void Awake() {
