@@ -4,23 +4,24 @@ using UnityEngine;
 using Fusion;
 using System;
 using TMPro;
+using UnityEngine.Serialization;
 
 public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
+	[Networked] public int redTeamKills { get; set; }
+	[Networked] public int blueTeamKills { get; set; }
+	
 	public static GameManager inst;
 	public static Player GetPlayer(NetworkRunner runner, PlayerRef player) => runner.GetPlayerObject(player).GetComponent<Player>();
 	public Camera mainCamera;
 	public Camera activeCamera;
 	public static List<Transform> spawns = new();
+	[SerializeField] List<NetworkPrefabRef> GunList = new();
 
 	[SerializeField] private TMP_InputField nameField;
 	[SerializeField] private TMP_Text nameText;
 	[SerializeField] private Transform spawnHolder;
 	[SerializeField] private NetworkPrefabRef playerPF;
-	public int redTeamCount;
-	public int blueTeamCount;
-	public int redTeamKills;
-	public int blueTeamKills;
-	public int killsToEndMatch;
+	public int gameKillsGoal;
 	
 	private void Awake() {
 		if (!inst) { inst = this; }
@@ -70,11 +71,6 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		cam.gameObject.SetActive(true);
 		activeCamera = cam;
 	}
-
-    public enum Team {
-		Red,
-		Blue
-    }
 	#region stubs
 	public void OnInput(NetworkRunner runner, NetworkInput input) { }
 	public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
@@ -91,4 +87,9 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	public void OnSceneLoadDone(NetworkRunner runner) { }
 	public void OnSceneLoadStart(NetworkRunner runner) { }
 	#endregion
+}
+
+public enum Team {
+	Red,
+	Blue
 }

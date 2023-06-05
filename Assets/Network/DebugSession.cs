@@ -20,5 +20,6 @@ public class DebugSession : MonoBehaviour {
             Scene = SceneManager.GetActiveScene().buildIndex,
             SceneManager = gameObject.AddComponent<NetworkSceneManagerDefault>()
         });
+        print($"Started debug session in {runner.GameMode}");
     }
 }

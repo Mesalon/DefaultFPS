@@ -1,6 +1,6 @@
+using System.Linq;
 using UnityEngine;
 using Fusion;
-using UnityEngine.UI;
 
 public class Player : NetworkBehaviour {
     [Networked] public NetworkString<_32> Name { get; set; }
@@ -8,25 +8,20 @@ public class Player : NetworkBehaviour {
     public Character character;
     public int Kills;
     public int Deaths;
-    public GameManager.Team team;
+    public Team team;
 
     public override void Spawned() {
         name = $"Player {Object.InputAuthority.PlayerId}";
         Name = name;
-        if(GameManager.inst.redTeamCount <= GameManager.inst.blueTeamCount) {
-            team = GameManager.Team.Red;
-            GameManager.inst.redTeamCount++;
-        } else {
-            team = GameManager.Team.Blue;
-            GameManager.inst.blueTeamCount++;
-        }
+        if(Runner.ActivePlayers.Count() % 2 == 0) { team = Team.Red; } 
+        else { team = Team.Blue; }
         print(team);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_SpawnCharacter(Vector3 position, PlayerRef player) {
         if (character) {
-            Debug.LogError("Attempted to spawn character when not dead yet! Killing . . .");
+            Debug.LogError("Attempted to spawn character when not dead yet! This indicates a catastrophic blunder somewhere in code. You have to be an extremely retarded to let this happen . . .");
             character.Kill();
         }
         if (Runner.IsServer && !character) {

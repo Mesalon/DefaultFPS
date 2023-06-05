@@ -5,39 +5,39 @@ using Fusion;
 using TMPro;
 using UnityEngine.VFX;
 
+public enum WeaponClass { Rifle, Pistol, }
 public class Firearm : NetworkBehaviour {
+    [Networked, HideInInspector] public NetworkBool TriggerState { get; set; }
     [Networked(OnChanged = nameof(FireFX))] private TickTimer FireTimer { get; set; }
     [Networked(OnChanged = nameof(ReloadFX))] private TickTimer ReloadTimer { get; set; }
-    [Networked(OnChanged = nameof(AmmoChange))] int Ammo { get; set; }
-    [Networked, HideInInspector] public NetworkBool TriggerState { get; set; }
-    [Networked] private int ReserveAmmo { get; set; }
-    [Networked] private NetworkBool DisconnectorState { get; set; }
+    [Networked] NetworkBool DisconnectorState { get; set; }
+    [Networked] public int Ammo { get; set; }
+    [Networked] public int ReserveAmmo { get; set; }
 
-    [Header("References")]
-    public Transform muzzle;
-    [SerializeField] private ProjectileData projectile;
-    [SerializeField] private AudioClip fireSound;
-    [SerializeField] private AudioClip reloadSound;
-    [SerializeField] private GameObject muzzleFlash;
-    private int projectileIndex = -1;
-    [Header("Settings")]
+    public Transform IKLTarget, IKRTarget, IKLPole, IKRPole;
     public Transform aimPoint;
+    public Transform muzzle;
+    public WeaponClass type;
     public float aimTime;
     public float aimingZoom;
     public float aimMoveSpeed;
     public float weight; // Affects handling time, smaller making the gun more snappy in it's movements.
-    [SerializeField] private bool isFullAuto;
-    [SerializeField] private float reloadTime;
-    [SerializeField] private float cyclicTime;
-    [SerializeField] private int capacity;
-    [SerializeField] private int startAmmo;
-    [SerializeField] private TMP_Text ammoCounter;
+    [SerializeField] ProjectileData projectile;
+    [SerializeField] AudioClip fireSound;
+    [SerializeField] AudioClip reloadSound;
+    [SerializeField] GameObject muzzleFlash;
+    [SerializeField] bool isFullAuto;
+    [SerializeField] float cyclicTime;
+    [SerializeField] float reloadTime;
+    [SerializeField] int capacity;
+    [SerializeField] int startAmmo;
     [Serializable] public class RecoilSettings {
         public float camSpeed, posSpeed, rotSpeed;
         public float posRecovery, rotRecovery;
         public Vector2 camRecoil, posRecoil, rotRecoil;
     } public RecoilSettings rs;
     
+    private int projectileIndex = -1;
     private Character owner;
     private new AudioSource audio;
     
@@ -50,9 +50,6 @@ public class Firearm : NetworkBehaviour {
     }
     public static void ReloadFX(Changed<Firearm> changed) {
         changed.Behaviour.audio.PlayOneShot(changed.Behaviour.reloadSound);
-    }
-    public static void AmmoChange(Changed<Firearm> changed) {
-        changed.Behaviour.ammoCounter.text = $"{changed.Behaviour.Ammo} / {changed.Behaviour.ReserveAmmo}";
     }
 
     void Awake() {

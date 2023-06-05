@@ -4,13 +4,12 @@ using UnityEngine.Serialization;
 
 [ExecuteInEditMode]
 public class TwoBoneIK : MonoBehaviour { // Stolen asf code
-    [SerializeField] private bool runInEditor;
-    [SerializeField] Transform target;
-    [SerializeField] Transform pole;
-    [SerializeField] float transformRotation;
-    [SerializeField] float lowerRotation;
+    public Transform target;
+    public Transform pole;
+    [SerializeField] bool runInEditor;
+    [SerializeField] float upperTwist;
+    [SerializeField] float lowerTwist;
     private Transform lowerBone, endBone;
-    // Values for use in cos rule
     private float a, b, c;
     private Vector3 en; // Normal of plane we want our arm to be on
 
@@ -24,6 +23,8 @@ public class TwoBoneIK : MonoBehaviour { // Stolen asf code
     }
 
     public void InvertKinematics() {
+        if (!target.gameObject.activeInHierarchy || !pole.gameObject.activeInHierarchy) { return; }
+        
         lowerBone = transform.GetChild(0);
         endBone = lowerBone.GetChild(0);
 
@@ -33,12 +34,12 @@ public class TwoBoneIK : MonoBehaviour { // Stolen asf code
         en = Vector3.Cross(target.position - transform.position, pole.position - transform.position);
         
         // Set the rotation of the upper arm
-        transform.rotation = Quaternion.LookRotation(target.position - transform.position, Quaternion.AngleAxis(transformRotation, Vector3.Scale(lowerBone.localPosition, lowerBone.lossyScale)) * (en));
+        transform.rotation = Quaternion.LookRotation(target.position - transform.position, Quaternion.AngleAxis(upperTwist, Vector3.Scale(lowerBone.localPosition, lowerBone.lossyScale)) * (en));
         transform.rotation *= Quaternion.Inverse(Quaternion.FromToRotation(Vector3.forward, Vector3.Scale(lowerBone.localPosition, lowerBone.lossyScale)));
         transform.rotation = Quaternion.AngleAxis(-CosAngle(a, c, b), -en) * transform.rotation;
 
         // Set the rotation of the lower arm
-        lowerBone.rotation = Quaternion.LookRotation(target.position - lowerBone.position, Quaternion.AngleAxis(lowerRotation, Vector3.Scale(endBone.localPosition, endBone.lossyScale)) * (en));
+        lowerBone.rotation = Quaternion.LookRotation(target.position - lowerBone.position, Quaternion.AngleAxis(lowerTwist, Vector3.Scale(endBone.localPosition, endBone.lossyScale)) * (en));
         lowerBone.rotation *= Quaternion.Inverse(Quaternion.FromToRotation(Vector3.forward, Vector3.Scale(endBone.localPosition, endBone.lossyScale)));
         
         endBone.rotation = target.rotation;
