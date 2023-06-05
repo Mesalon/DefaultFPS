@@ -20,7 +20,9 @@ public class Firearm : NetworkBehaviour {
     public WeaponClass type;
     public float aimTime;
     public float aimingZoom;
-    public float aimMoveSpeed;
+    public float walkSpeed;
+    public float aimingSpeedMult = 1.25f;
+    public float runningSpeedMult = 0.75f;
     public float weight; // Affects handling time, smaller making the gun more snappy in it's movements.
     [SerializeField] ProjectileData projectile;
     [SerializeField] AudioClip fireSound;
@@ -81,9 +83,9 @@ public class Firearm : NetworkBehaviour {
                     ProjectileManager.inst.CreateProjectile(new(projectileIndex, Object.InputAuthority, input.muzzlePos, input.muzzleDir, Runner.Tick, 4, Runner));
                     if (!isFullAuto) { DisconnectorState = true; }
                     if (Runner.IsForward) {
-                        owner.currentCamRecoil += rs.camRecoil;
-                        owner.currentPosRecoil += rs.posRecoil;
-                        owner.currentRotRecoil += rs.rotRecoil;
+                        owner.handling.currentCamRecoil += rs.camRecoil;
+                        owner.handling.currentPosRecoil += rs.posRecoil;
+                        owner.handling.currentRotRecoil += rs.rotRecoil;
                     }
                 }
             }

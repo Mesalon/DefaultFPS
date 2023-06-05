@@ -3,12 +3,12 @@ using UnityEngine;
 using Fusion;
 
 public class Player : NetworkBehaviour {
-    [Networked] public NetworkString<_32> Name { get; set; }
+    [HideInInspector, Networked] public NetworkString<_32> Name { get; set; }
+    [HideInInspector, Networked] public Team team { set; get; }
+    [HideInInspector, Networked] public int Kills { get; set; }
+    [HideInInspector, Networked] public int Deaths { get; set; }
     [SerializeField] private NetworkPrefabRef characterPF;
-    public Character character;
-    public int Kills;
-    public int Deaths;
-    public Team team;
+    [HideInInspector] public Character character;
 
     public override void Spawned() {
         name = $"Player {Object.InputAuthority.PlayerId}";
