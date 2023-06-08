@@ -1,6 +1,5 @@
 using UnityEngine;
 using Fusion;
-using Debug = UnityEngine.Debug;
 
 public struct  Projectile : INetworkStruct {
     private NetworkRunner Runner => ProjectileManager.inst.Runner;

@@ -19,7 +19,7 @@ public class Character : NetworkBehaviour {
         locomotion = GetComponent<Locomotion>();
         UI = GetComponent<UI>();
     }
-    private new void OnEnable() { controls.Enable(); }
+    private void OnEnable() { controls.Enable(); }
     private void OnDisable() { controls.Disable(); }
 
     private void OnInput(NetworkRunner runner, NetworkInput input) {
