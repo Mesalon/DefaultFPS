@@ -46,7 +46,7 @@ public class Locomotion : NetworkBehaviour {
                 if (VelocityY < 0) VelocityY = 0;
                 if (input.buttons.WasPressed(LastInput.buttons, Buttons.Jump)) VelocityY += jumpForce;
             }
-            print($"{name} - Tick: {Runner.Tick}, vel: {VelocityY}, ground: {cc.isGrounded}");
+            //print($"{name} - Tick: {Runner.Tick}, vel: {VelocityY}, ground: {cc.isGrounded}");
             cc.Move(new Vector3(moveVelocity.x, VelocityY, moveVelocity.z) * Runner.DeltaTime);
             
             LastInput = input;

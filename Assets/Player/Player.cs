@@ -13,7 +13,7 @@ public class Player : NetworkBehaviour {
     public override void Spawned() {
         name = $"Player {Object.InputAuthority.PlayerId}";
         Name = name;
-        if(Runner.ActivePlayers.Count() % 2 == 0) { team = Team.Red; } 
+        if(Runner.ActivePlayers.Count() % 2 == 1) { team = Team.Red; } 
         else { team = Team.Blue; }
         print(team);
     }
