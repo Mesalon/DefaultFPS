@@ -13,14 +13,15 @@ MonoBehaviour:
   m_Name: _45 FMJ
   m_EditorClassIdentifier: 
   tracerMesh: {fileID: 4300000, guid: 3eb0c8c8f87208765a50527cf0b6c999, type: 2}
-  tracerMat: {fileID: 2100000, guid: 107849f836d21060abcfe6780bec1305, type: 2}
+  tracerMat: {fileID: 2100000, guid: f5dec08d9dbaf4228aeeb0309d0b675b, type: 2}
   speed: 285
-  damage: 24
+  damage: 32
   canRicochet: 0
   maxRicochetAngle: 0
   ricochetThreshold: 0
   ricochetDamping: 0
   penetration: 0
+  impact: {fileID: 0}
   showDebugTracers: 1
   debugTracerTime: 1
   debugTracerColor: {r: 1, g: 0, b: 0, a: 1}

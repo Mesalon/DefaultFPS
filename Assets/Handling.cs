@@ -1,19 +1,27 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 
 public class Handling : NetworkBehaviour {
     [Networked] private WeaponRole CurrentGunType { get; set; }
     [Networked] NetworkInputData LastInput { get; set; }
-    [HideInInspector] public Firearm gun;
+    [Networked] public int SelectedGun1 { get; set; }
+    [Networked] public int SelectedGun2 { get; set; }
+    public TwoBoneIK armIKL, armIKR;
+    public Transform awayPose;
+    [HideInInspector] public Firearm equippedGun;
     [HideInInspector] public Character character;
     [HideInInspector] public Vector2 currentCamRecoil, currentPosRecoil, currentRotRecoil;
-    [SerializeField] Firearm primaryGun, secondaryGun;
-    [SerializeField] Transform gunAwayPose;
+    [SerializeField] Transform head;
     [SerializeField] Transform riflePose, rifleSprintPose;
     [SerializeField] Transform pistolPose, pistolSprintPose;
-    [SerializeField] TwoBoneIK armIKL, armIKR;
+    [SerializeField] List<Firearm> gun1Library;
+    [SerializeField] List<Firearm> gun2Library;
     [SerializeField] Camera cam;
     [SerializeField] float lookSway, moveSway;
+    
+    public Firearm gun1, gun2; // Guns actually used
     private Locomotion locomotion;
     private float startFOV, startBobSpeed, startPosBob, startRotBob;
     private Firearm newGun; // For switching weapons
@@ -29,31 +37,45 @@ public class Handling : NetworkBehaviour {
     private void Awake() {
         character = GetComponent<Character>();
         locomotion = GetComponent<Locomotion>();
-    }
-
-    public override void Spawned() {
-        CurrentGunType = WeaponRole.Primary;
-        newGun = gun = primaryGun;
         startFOV = cam.fieldOfView;
         startBobSpeed = bobSpeed;
         startPosBob = posBob;
         startRotBob = rotBob;
-        gunHandlePose = new(gun.transform.localPosition, gun.transform.localRotation);
+    }
+
+    public override void Spawned() {
+        CurrentGunType = WeaponRole.Primary;
+        gun1 = gun1Library[SelectedGun1];
+        gun2 = gun2Library[SelectedGun2];
+        gun1.gameObject.SetActive(true);
+        gun1.transform.SetPositionAndRotation(awayPose.position, awayPose.rotation);
+        gun2.transform.SetPositionAndRotation(awayPose.position, awayPose.rotation);
+        gun1.transform.SetParent(head);
+        gun2.transform.SetParent(head);
+        gun1.owner = character;
+        gun2.owner = character;
+        
+        armIKL.target = gun1.IKLTarget;
+        armIKR.target = gun1.IKRTarget;
+        equippedGun = newGun = gun1;
+        gunHandlePose = new(equippedGun.transform.localPosition, equippedGun.transform.localRotation);
     }
 
     public override void FixedUpdateNetwork() {
         if (GetInput(out NetworkInputData input)) {
-            if (input.buttons.IsSet(Buttons.Aim)) { locomotion.CurrentMoveSpeed = gun.walkSpeed * gun.aimingSpeedMult; }
-            else if (input.buttons.IsSet(Buttons.Run)) { locomotion.CurrentMoveSpeed = gun.walkSpeed * gun.runningSpeedMult; }
-            else { locomotion.CurrentMoveSpeed = gun.walkSpeed; }
+            if (input.buttons.IsSet(Buttons.Aim)) { locomotion.CurrentMoveSpeed = equippedGun.walkSpeed * equippedGun.aimingSpeedMult; }
+            else if (input.buttons.IsSet(Buttons.Run)) { locomotion.CurrentMoveSpeed = equippedGun.walkSpeed * equippedGun.runningSpeedMult; }
+            else { locomotion.CurrentMoveSpeed = equippedGun.walkSpeed; }
             
-            if (input.buttons.WasPressed(LastInput.buttons, Buttons.switchPrimary)) { CurrentGunType = WeaponRole.Primary; }
-            if (input.buttons.WasPressed(LastInput.buttons, Buttons.switchSecondary)) { CurrentGunType = WeaponRole.Secondary; }
-            if (input.buttons.WasPressed(LastInput.buttons, Buttons.Reload)) { gun.Reload(); }
-            gun.TriggerState = input.buttons.IsSet(Buttons.Fire);
+            if (input.buttons.WasPressed(LastInput.buttons, Buttons.Weapon1)) { CurrentGunType = WeaponRole.Primary; }
+            if (input.buttons.WasPressed(LastInput.buttons, Buttons.Weapon2)) { CurrentGunType = WeaponRole.Secondary; }
+            if (equippedGun.Object.IsValid) {
+                if (input.buttons.WasPressed(LastInput.buttons, Buttons.Reload)) { equippedGun.Reload(); }
+                equippedGun.TriggerState = input.buttons.IsSet(Buttons.Fire);
+            }
             LastInput = input;
         }
-        newGun = CurrentGunType == WeaponRole.Primary ? primaryGun : secondaryGun;
+        newGun = CurrentGunType == WeaponRole.Primary ? gun1 : gun2;
     }
 
     public override void Render() {
@@ -61,17 +83,17 @@ public class Handling : NetworkBehaviour {
         float poseTime;
         float fovTarget, bobSpeedTarget, posBobTarget, rotBobTarget;
         if (LastInput.buttons.IsSet(Buttons.Aim)) {
-            gunPoseTarget = new(cam.transform.localPosition - gun.aimPoint.localPosition, Quaternion.identity);
-            poseTime = gun.aimTime;
-            fovTarget = startFOV / gun.aimingZoom;
-            locomotion.currentSensitivity = locomotion.sensitivity / gun.aimingZoom;
+            gunPoseTarget = new(cam.transform.localPosition - equippedGun.transform.InverseTransformPoint(equippedGun.aimPoint.position), Quaternion.identity);
+            poseTime = equippedGun.aimTime;
+            fovTarget = startFOV / equippedGun.aimingZoom;
+            locomotion.currentSensitivity = locomotion.sensitivity / equippedGun.aimingZoom;
             bobSpeedTarget = aimBobSpeed;
             posBobTarget = aimPosBob;
             rotBobTarget = aimRotBob;
         }
         else if (LastInput.buttons.IsSet(Buttons.Run)) {
-            gunPoseTarget = gun.type == WeaponClass.Rifle ? new(rifleSprintPose.localPosition, rifleSprintPose.localRotation) : new(pistolSprintPose.localPosition, pistolSprintPose.localRotation);
-            poseTime = gun.weight;
+            gunPoseTarget = equippedGun.type == WeaponClass.Rifle ? new(rifleSprintPose.localPosition, rifleSprintPose.localRotation) : new(pistolSprintPose.localPosition, pistolSprintPose.localRotation);
+            poseTime = equippedGun.weight;
             fovTarget = sprintFOV;
             locomotion.currentSensitivity = locomotion.sensitivity;
             bobSpeedTarget = sprintBobSpeed;
@@ -79,8 +101,8 @@ public class Handling : NetworkBehaviour {
             rotBobTarget = sprintRotBob;
         }
         else {
-            poseTime = gun.weight;
-            gunPoseTarget = gun.type == WeaponClass.Rifle ? new(riflePose.localPosition, riflePose.localRotation) : new(pistolPose.localPosition, pistolPose.localRotation);
+            poseTime = equippedGun.weight;
+            gunPoseTarget = equippedGun.type == WeaponClass.Rifle ? new(riflePose.localPosition, riflePose.localRotation) : new(pistolPose.localPosition, pistolPose.localRotation);
             fovTarget = startFOV;
             locomotion.currentSensitivity = locomotion.sensitivity;
             bobSpeedTarget = startBobSpeed;
@@ -89,26 +111,26 @@ public class Handling : NetworkBehaviour {
         }
         
         // Weapon switching
-        if (gun != newGun) {
-            gunPoseTarget = new(gunAwayPose.localPosition, gunAwayPose.localRotation);
+        if (equippedGun != newGun) {
+            gunPoseTarget = new(awayPose.localPosition, awayPose.localRotation);
             poseTime = newGun.weight;
-            if ((gun.transform.position - gunAwayPose.position).magnitude < 0.05f) { // Done switching
-                gunHandlePose = new(gunAwayPose.localPosition, gunAwayPose.localRotation);
-                gun.gameObject.SetActive(false);
-                gun = newGun;
+            if ((equippedGun.transform.position - awayPose.position).magnitude < 0.05f) { // Done switching
+                gunHandlePose = new(awayPose.localPosition, awayPose.localRotation);
+                equippedGun.gameObject.SetActive(false);
+                equippedGun = newGun;
             }
         }
         else if (!newGun.gameObject.activeSelf) {
             newGun.gameObject.SetActive(true);
             armIKL.target = newGun.IKLTarget;
             armIKR.target = newGun.IKRTarget;
-            gunHandlePose = new(gunAwayPose.localPosition, gunAwayPose.localRotation);
+            gunHandlePose = new(awayPose.localPosition, awayPose.localRotation);
         }
         
-        cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, fovTarget, ref vel2, gun.weight);
-        bobSpeed = Mathf.SmoothDamp(bobSpeed, bobSpeedTarget, ref vel4, gun.weight);
-        posBob = Mathf.SmoothDamp(posBob, posBobTarget, ref vel5, gun.weight);
-        rotBob = Mathf.SmoothDamp(rotBob, rotBobTarget, ref vel6, gun.weight);
+        cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, fovTarget, ref vel2, equippedGun.weight);
+        bobSpeed = Mathf.SmoothDamp(bobSpeed, bobSpeedTarget, ref vel4, equippedGun.weight);
+        posBob = Mathf.SmoothDamp(posBob, posBobTarget, ref vel5, equippedGun.weight);
+        rotBob = Mathf.SmoothDamp(rotBob, rotBobTarget, ref vel6, equippedGun.weight);
         gunHandlePose.position = Vector3.SmoothDamp(gunHandlePose.position, gunPoseTarget.position, ref velV1, poseTime);
         gunHandlePose.rotation = QuaternionSmoothDamp(gunHandlePose.rotation, gunPoseTarget.rotation, ref velQ1, poseTime);
         // Weapon bob
@@ -126,20 +148,20 @@ public class Handling : NetworkBehaviour {
         gunBobPose.rotation = QuaternionSmoothDamp(gunBobPose.rotation, bobRotTarget * lookSwayRot, ref velQ2, 0.1f);
 
         // Weapon Recoil
-        Vector2 appliedPosRecoil = currentPosRecoil * gun.rs.posSpeed * Time.deltaTime;
-        Vector2 appliedRotRecoil = currentRotRecoil * gun.rs.rotSpeed * Time.deltaTime;
-        Vector2 appliedCamRecoil = currentCamRecoil * gun.rs.camSpeed * Time.deltaTime;
+        Vector2 appliedPosRecoil = currentPosRecoil * equippedGun.rs.posSpeed * Time.deltaTime;
+        Vector2 appliedRotRecoil = currentRotRecoil * equippedGun.rs.rotSpeed * Time.deltaTime;
+        Vector2 appliedCamRecoil = currentCamRecoil * equippedGun.rs.camSpeed * Time.deltaTime;
         gunRecoilPose.position += new Vector3(0, appliedPosRecoil.y, appliedPosRecoil.x);
         gunRecoilPose.rotation *= Quaternion.Euler(appliedRotRecoil.y, appliedRotRecoil.x, 0);
-        gunRecoilPose.position = Vector3.Slerp(gunRecoilPose.position, Vector3.zero, gun.rs.posRecovery * Time.deltaTime);
-        gunRecoilPose.rotation = Quaternion.Slerp(gunRecoilPose.rotation, Quaternion.identity, gun.rs.rotRecovery * Time.deltaTime);
+        gunRecoilPose.position = Vector3.Slerp(gunRecoilPose.position, Vector3.zero, equippedGun.rs.posRecovery * Time.deltaTime);
+        gunRecoilPose.rotation = Quaternion.Slerp(gunRecoilPose.rotation, Quaternion.identity, equippedGun.rs.rotRecovery * Time.deltaTime);
         locomotion.localLook += appliedCamRecoil;
         currentPosRecoil -= appliedPosRecoil;
         currentRotRecoil -= appliedRotRecoil;
         currentCamRecoil -= appliedCamRecoil;
         
-        gun.transform.localPosition = gunHandlePose.position + gunRecoilPose.position + gunBobPose.position;
-        gun.transform.localRotation = gunHandlePose.rotation * gunRecoilPose.rotation * gunBobPose.rotation;
+        equippedGun.transform.localPosition = gunHandlePose.position + gunRecoilPose.position + gunBobPose.position;
+        equippedGun.transform.localRotation = gunHandlePose.rotation * gunRecoilPose.rotation * gunBobPose.rotation;
 
         // IK
         armIKL.InvertKinematics();

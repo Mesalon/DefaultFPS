@@ -53,9 +53,11 @@ MonoBehaviour:
   _team: 0
   _Kills: 0
   _Deaths: 0
+  character: {fileID: 0}
+  gun1: 0
+  gun2: 0
   characterPF:
     RawGuidValue: 93c56d1fd17104be29d7ea939e0bac0a
-  character: {fileID: 0}
 --- !u!114 &1139018457521385856
 MonoBehaviour:
   m_ObjectHideFlags: 0

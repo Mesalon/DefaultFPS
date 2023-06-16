@@ -8,7 +8,6 @@ public struct  Projectile : INetworkStruct {
     private PlayerRef owner;
     public Vector3 firePosition { get; }
     public Vector3 direction;
-
     public int fireTick;
     public int finishTick;
 
@@ -41,10 +40,11 @@ public struct  Projectile : INetworkStruct {
 
         if (Runner.LagCompensation.Raycast(lastPosition, Position - lastPosition, Vector3.Distance(Position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX, layerMask: ProjectileManager.inst.projectileMask)) {
             hitPosition = hit.Point;
-            if (hit.Hitbox) {
-                if (hit.Hitbox.transform.root.TryGetComponent(out Character hitCharacter)) {
-                    hitCharacter.Damage(GameManager.GetPlayer(Runner, owner), ProjectileManager.inst.projectileLibrary[dataIndex].damage);
-                }
+            if (hit.Hitbox && hit.Hitbox.Root.TryGetComponent(out Character c)) {
+                c.Damage(new() {
+                    attacker = owner,
+                    hitNormal = hit.Normal,
+                }, ProjectileManager.inst.projectileLibrary[dataIndex].damage);
                 destroyProjectile = true;
             }
             else { // If it hit anything else

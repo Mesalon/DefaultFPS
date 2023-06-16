@@ -1,4 +1,5 @@
 using System;
+using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -9,6 +10,7 @@ public class TwoBoneIK : MonoBehaviour { // Stolen asf code
     [SerializeField] bool runInEditor;
     [SerializeField] float upperTwist;
     [SerializeField] float lowerTwist;
+    [SerializeField] private float originalZRot;
     private Transform lowerBone, endBone;
     private float a, b, c;
     private Vector3 en; // Normal of plane we want our arm to be on
@@ -23,7 +25,12 @@ public class TwoBoneIK : MonoBehaviour { // Stolen asf code
     }
 
     public void InvertKinematics() {
-        if (!target.gameObject.activeInHierarchy || !pole.gameObject.activeInHierarchy) { return; }
+        if (!target || !pole.gameObject.activeInHierarchy) {
+            transform.localRotation = Quaternion.Euler(0, 0, originalZRot);
+            lowerBone.localRotation = Quaternion.identity;
+            endBone.localRotation = Quaternion.identity;
+            return;
+        }
         
         lowerBone = transform.GetChild(0);
         endBone = lowerBone.GetChild(0);

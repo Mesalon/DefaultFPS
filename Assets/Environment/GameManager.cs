@@ -4,24 +4,21 @@ using UnityEngine;
 using Fusion;
 using System;
 using TMPro;
-using UnityEngine.Serialization;
 
 public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	[Networked] public int redTeamKills { get; set; }
 	[Networked] public int blueTeamKills { get; set; }
 	
 	public static GameManager inst;
-	public static Player GetPlayer(NetworkRunner runner, PlayerRef player) => runner.GetPlayerObject(player).GetComponent<Player>();
+	public static Player GetPlayer(PlayerRef player) => inst.Runner.GetPlayerObject(player).GetComponent<Player>();
 	public Camera mainCamera;
 	public Camera activeCamera;
 	public static List<Transform> spawns = new();
-	[SerializeField] List<NetworkPrefabRef> GunList = new();
 
 	[SerializeField] private TMP_InputField nameField;
 	[SerializeField] private TMP_Text nameText;
 	[SerializeField] private Transform spawnHolder;
 	[SerializeField] private NetworkPrefabRef playerPF;
-	public int gameKillsGoal;
 	
 	private void Awake() {
 		if (!inst) { inst = this; }
@@ -29,7 +26,7 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		foreach (Transform child in spawnHolder) { spawns.Add(child); }
 		
 		nameField.onSubmit.AddListener(input => {
-			GetPlayer(Runner, Runner.LocalPlayer).RPC_SetName(input);
+			GetPlayer(Runner.LocalPlayer).RPC_SetName(input);
 			nameField.text = "";
 		});
 	}
@@ -49,6 +46,7 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		if (Runner.IsServer) {
 			NetworkObject playerObject = runner.Spawn(playerPF, Vector3.zero, Quaternion.identity, player);
 			Runner.SetPlayerObject(player, playerObject);
+			print(Runner.GetPlayerObject(player));
 		}
 	}
 
@@ -56,7 +54,7 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		if (Runner.IsServer) {
 			runner.Despawn(Runner.GetPlayerObject(player));
 			Character c = Runner.GetPlayerObject(player).GetComponent<Player>().character;
-			if(c) { c.Kill(); }
+			if (c) { c.Health = 0; }
 			Runner.SetPlayerObject(player, null);
 		}
 		print($"Destroyed player {player}");

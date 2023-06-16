@@ -43,10 +43,10 @@ public class UI : NetworkBehaviour {
         if (Object.HasInputAuthority) {
             healthSlider.value = character.Health;
             fill.color = gradient.Evaluate(healthSlider.normalizedValue);
-            ammoCounter.text = $"{character.handling.gun.Ammo} / {character.handling.gun.ReserveAmmo}";
+            ammoCounter.text = $"{character.handling.equippedGun.Ammo} / {character.handling.equippedGun.ReserveAmmo}";
             Application.targetFrameRate = FPSCap;
         }else { // Nametags
-            nametagText.text = character.player.Name.ToString();
+            nametagText.text = character.Player.Name.ToString();
             Transform activeCam = GameManager.inst.activeCamera.transform;
             float angle = Vector3.Angle(activeCam.forward, (nametagAimPoint.position - activeCam.position).normalized);
             Color col = nametagText.color;
@@ -71,7 +71,7 @@ public class UI : NetworkBehaviour {
     
     public void IndicateKill(Character victim) {
         IEnumerator CR() {
-            killIndicator.text = $"KILL - {victim.player.Name}";
+            killIndicator.text = $"KILL - {victim.Player.Name}";
             killIndicator.gameObject.SetActive(true);
             yield return new WaitForSeconds(1.5f);
             killIndicator.gameObject.SetActive(false);

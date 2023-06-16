@@ -68,3 +68,5 @@ crashlytics-build.properties
 UserSettings/Layouts/
 
 *.blob
+
+.attach_pid10992
