@@ -69,6 +69,14 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		cam.gameObject.SetActive(true);
 		activeCamera = cam;
 	}
+
+	public void AssignPrimaryGun(int index) {
+		Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>().gun1 = index;
+	}
+
+	public void AssignSecondaryGun(int index) {
+		Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>().gun2 = index;
+	}
 	#region stubs
 	public void OnInput(NetworkRunner runner, NetworkInput input) { }
 	public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
