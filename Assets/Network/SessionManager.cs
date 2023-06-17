@@ -24,7 +24,8 @@ public class SessionManager : MonoBehaviour {
 			0 => GameMode.Host,
 			1 => GameMode.Client,
 			2 => GameMode.AutoHostOrClient,
-			3 => GameMode.Single
+			3 => GameMode.Single,
+			_ => GameMode.Single
 		});
 	}
 }

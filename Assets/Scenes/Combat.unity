@@ -324,13 +324,18 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -9214031448191335240, guid: 8e5eaebf1dba51d62a07cfc38aa6622e,
         type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -9214031448191335240, guid: 8e5eaebf1dba51d62a07cfc38aa6622e,
+        type: 3}
       propertyPath: singlePlayer
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4332936987007726658, guid: 8e5eaebf1dba51d62a07cfc38aa6622e,
         type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 4332936987007726658, guid: 8e5eaebf1dba51d62a07cfc38aa6622e,
         type: 3}
@@ -386,6 +391,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Debug Session
+      objectReference: {fileID: 0}
+    - target: {fileID: 5802001003462166042, guid: 8e5eaebf1dba51d62a07cfc38aa6622e,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -474,13 +484,11 @@ MonoBehaviour:
   _blueTeamKills: 0
   mainCamera: {fileID: 1357258505}
   activeCamera: {fileID: 0}
-  GunList: []
   nameField: {fileID: 680779733}
   nameText: {fileID: 1021415710}
   spawnHolder: {fileID: 638943493}
   playerPF:
     RawGuidValue: a04a6d9f1217b508c82780a9b2e15bdb
-  gameKillsGoal: 0
 --- !u!4 &432188709
 Transform:
   m_ObjectHideFlags: 0
@@ -494,7 +502,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &441850495
 GameObject:
@@ -562,7 +570,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &544859732
 GameObject:
@@ -999,7 +1007,7 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 4c070fc11c008ae63b5a00910fe51d26,
         type: 3}
       propertyPath: m_RootOrder
-      value: 3
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 4c070fc11c008ae63b5a00910fe51d26,
         type: 3}
@@ -1105,6 +1113,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Layer
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 4c070fc11c008ae63b5a00910fe51d26,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4356877828898064976, guid: 4c070fc11c008ae63b5a00910fe51d26,
         type: 3}
@@ -1808,7 +1821,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 4
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!114 &1216206056
 MonoBehaviour:
@@ -1999,7 +2012,7 @@ Transform:
   m_Children:
   - {fileID: 1580297779}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1387623014
 GameObject:
