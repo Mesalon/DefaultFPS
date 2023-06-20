@@ -1,4 +1,6 @@
 using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
 using Fusion.Editor;
@@ -10,6 +12,8 @@ public class Player : NetworkBehaviour {
     [HideInInspector, Networked] public int Deaths { get; set; }
     [HideInInspector] public Character character;
     public int gun1, gun2;
+    public List<Attachment> gun1Attachments;
+    public List<Attachment> gun2Attachments;
     [SerializeField] NetworkPrefabRef characterPF;
 
     public override void Spawned() {

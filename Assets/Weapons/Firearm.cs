@@ -30,7 +30,10 @@ public class Firearm : NetworkBehaviour {
     public float runningSpeedMult = 1.25f;
     public float weight; // Affects handling speed
     public VisualEffect muzzleFlash;
-    [SerializeField] private List<AttachmentMount> attachmentMounts;
+    public List<AttachmentMount> attachmentMounts;
+    public List<GripAttachment> compatibleGrips;
+    public List<OpticAttachment> compatibleOptics;
+    public List<MuzzleAttachment> compatibleMuzzles;
     [SerializeField] ProjectileData projectile;
     [SerializeField] AudioClip fireSound;
     [SerializeField] AudioClip reloadSound;
@@ -44,6 +47,31 @@ public class Firearm : NetworkBehaviour {
 
     void Awake() {
         audio = GetComponent<AudioSource>();
+        if(type == WeaponClass.Rifle) {
+            foreach(Attachment attachment in Runner.GetPlayerObject(Object.InputAuthority).GetComponent<Player>().gun1Attachments) {
+                if(attachment.GetType() == typeof(GripAttachment)) {
+                    attachmentMounts[2].attachment = attachment;
+                }
+                if (attachment.GetType() == typeof(OpticAttachment)) {
+                    attachmentMounts[0].attachment = attachment;
+                }
+                if (attachment.GetType() == typeof(MuzzleAttachment)) {
+                    attachmentMounts[1].attachment = attachment;
+                }
+            }
+        } else {
+            foreach (Attachment attachment in Runner.GetPlayerObject(Object.InputAuthority).GetComponent<Player>().gun2Attachments) {
+                if (attachment.GetType() == typeof(GripAttachment)) {
+                    attachmentMounts[2].attachment = attachment;
+                }
+                if (attachment.GetType() == typeof(OpticAttachment)) {
+                    attachmentMounts[0].attachment = attachment;
+                }
+                if (attachment.GetType() == typeof(MuzzleAttachment)) {
+                    attachmentMounts[1].attachment = attachment;
+                }
+            }
+        }
         foreach (AttachmentMount mount in attachmentMounts) {
             if (mount.attachment) {
                 Instantiate(mount.attachment, mount.transform).Initalize(this); 

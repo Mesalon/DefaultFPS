@@ -396,6 +396,13 @@ MonoBehaviour:
   - {fileID: 1688459603368403530}
   - {fileID: 5468580331899454568}
   - {fileID: 5444701170068278883}
+  compatibleGrips: []
+  compatibleOptics:
+  - {fileID: 7143601467848730081, guid: 5d5e0e7576cba5b4d81f5addfc98bb12, type: 3}
+  - {fileID: 8068312773067690628, guid: 0d460d17e495f77da861212eb69ea4b2, type: 3}
+  - {fileID: 7143601467848730081, guid: 5d5e0e7576cba5b4d81f5addfc98bb12, type: 3}
+  compatibleMuzzles:
+  - {fileID: -6581589740175079309, guid: 73f0c54f9c4718d79bc1d2debd730d1d, type: 3}
   projectile: {fileID: 11400000, guid: 3d58086aeac60c5c79dd468ca4baa2ca, type: 2}
   fireSound: {fileID: 8300000, guid: 72388a84fdb44201d839278ed99bb232, type: 3}
   reloadSound: {fileID: 8300000, guid: 467b69f2afb7edd17bd6c4162d7d5df1, type: 3}
