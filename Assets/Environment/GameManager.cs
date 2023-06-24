@@ -46,7 +46,6 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		if (Runner.IsServer) {
 			NetworkObject playerObject = runner.Spawn(playerPF, Vector3.zero, Quaternion.identity, player);
 			Runner.SetPlayerObject(player, playerObject);
-			print(Runner.GetPlayerObject(player));
 		}
 	}
 

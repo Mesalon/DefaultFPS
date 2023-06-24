@@ -1304,7 +1304,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b98457efe97c635a6bd1f09e4c7b6f94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attachment: {fileID: 0}
+  attachment: {fileID: 7065327916292815888, guid: c2d1a1224debe2d9d91f640d0b365794,
+    type: 3}
   defaultAttachment: {fileID: 8044433927122021795}
 --- !u!1 &5089113226778311973
 GameObject:
@@ -2035,7 +2036,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b98457efe97c635a6bd1f09e4c7b6f94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attachment: {fileID: 0}
+  attachment: {fileID: 7383858732546028506, guid: 1a89126799b562cdcb8497f471659131,
+    type: 3}
   defaultAttachment: {fileID: 7358331533431260418}
 --- !u!1 &7305498556564493966
 GameObject:
@@ -2481,7 +2483,6 @@ MonoBehaviour:
   _interpolationDataSource: 0
   _TriggerState:
     _value: 0
-  _Active: 0
   _Ammo: 0
   _ReserveAmmo: 0
   IKLTarget: {fileID: 0}
@@ -2491,18 +2492,6 @@ MonoBehaviour:
   rMods: []
   aimingZoom: 0
   IKRTarget: {fileID: 4878430759144916581}
-  rs:
-    camSpeed: 35
-    posSpeed: 40
-    rotSpeed: 20
-    posRecovery: 75
-    rotRecovery: 25
-    recoilY: 2.5
-    minRecoilX: -2
-    maxRecoilX: 2.5
-    stability: 0.8
-    posRecoilMult: 0.015
-    rotRecoilMult: 2.5
   type: 0
   aimTime: 0.15
   walkSpeed: 2.75
@@ -2517,8 +2506,20 @@ MonoBehaviour:
   projectile: {fileID: 11400000, guid: af84f32b963467ce7bd7f4fdae7d35ad, type: 2}
   fireSound: {fileID: 8300000, guid: 72388a84fdb44201d839278ed99bb232, type: 3}
   reloadSound: {fileID: 8300000, guid: 467b69f2afb7edd17bd6c4162d7d5df1, type: 3}
+  rs:
+    camSpeed: 35
+    posSpeed: 40
+    rotSpeed: 20
+    posRecovery: 75
+    rotRecovery: 25
+    recoilY: 2.5
+    minRecoilX: -2
+    maxRecoilX: 2
+    stability: 0.85
+    posRecoilMult: 0.015
+    rotRecoilMult: 2.5
   isFullAuto: 1
-  cyclicRate: 900
+  cyclicRate: 800
   reloadTime: 2.75
   capacity: 30
   startAmmo: 3000
@@ -2853,7 +2854,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b98457efe97c635a6bd1f09e4c7b6f94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attachment: {fileID: 0}
+  attachment: {fileID: -6581589740175079309, guid: 73f0c54f9c4718d79bc1d2debd730d1d,
+    type: 3}
   defaultAttachment: {fileID: 8063357449097156664}
 --- !u!1 &9078350821840659656
 GameObject:

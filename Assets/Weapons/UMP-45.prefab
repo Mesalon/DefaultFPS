@@ -754,8 +754,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b98457efe97c635a6bd1f09e4c7b6f94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attachment: {fileID: 7143601467848730081, guid: 5d5e0e7576cba5b4d81f5addfc98bb12,
-    type: 3}
+  attachment: {fileID: 0}
   defaultAttachment: {fileID: 2223993364365457131}
 --- !u!1 &8159260856876636147
 GameObject:

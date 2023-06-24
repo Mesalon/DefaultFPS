@@ -334,7 +334,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b98457efe97c635a6bd1f09e4c7b6f94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attachment: {fileID: 0}
+  attachment: {fileID: 8068312773067690628, guid: 0d460d17e495f77da861212eb69ea4b2,
+    type: 3}
   defaultAttachment: {fileID: 3696064741264969131}
 --- !u!1 &3216037694520066391
 GameObject:
@@ -656,7 +657,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b98457efe97c635a6bd1f09e4c7b6f94, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attachment: {fileID: 0}
+  attachment: {fileID: -6581589740175079309, guid: 73f0c54f9c4718d79bc1d2debd730d1d,
+    type: 3}
   defaultAttachment: {fileID: 4617326202519931428}
 --- !u!1001 &8198889065625453361
 PrefabInstance:

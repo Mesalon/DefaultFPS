@@ -790,7 +790,8 @@ GameObject:
   - component: {fileID: -270113763915573476}
   - component: {fileID: 7373343370299481131}
   - component: {fileID: 8687896442830934809}
-  - component: {fileID: 627049393995240112}
+  - component: {fileID: 5500605181910046035}
+  - component: {fileID: 832363380349901326}
   - component: {fileID: 6442570602906546450}
   - component: {fileID: 6867888140164478266}
   m_Layer: 2
@@ -868,14 +869,30 @@ MonoBehaviour:
   _interpolationDataSource: 0
   _SelectedGun1: 0
   _SelectedGun2: 0
-  armIKL: {fileID: 533572439635855415}
-  armIKR: {fileID: 4095855130316275848}
-  awayPose: {fileID: 2646858495390653539}
   equippedGun: {fileID: 0}
   character: {fileID: 0}
   currentCamRecoil: {x: 0, y: 0}
   currentPosRecoil: {x: 0, y: 0}
   currentRotRecoil: {x: 0, y: 0}
+  armIKL: {fileID: 533572439635855415}
+  armIKR: {fileID: 4095855130316275848}
+  awayPose: {fileID: 2646858495390653539}
+  gun1: {fileID: 0}
+  gun2: {fileID: 0}
+  bobSpeed: 8
+  posBob: 0.005
+  rotBob: 2
+  sprintFOV: 105
+  sprintBobSpeed: 9
+  sprintPosBob: 0.04
+  sprintRotBob: 7
+  aimBobSpeed: 4
+  aimPosBob: 0.002
+  aimRotBob: 0
+  lookSwayFactor: 3
+  lookSwayRecovery: 0.1
+  moveSwayFactor: 2
+  moveSwayRecovery: 0.2
   head: {fileID: 6229061859744471449}
   riflePose: {fileID: 4122668644934832065}
   rifleSprintPose: {fileID: 266448692937990675}
@@ -890,20 +907,6 @@ MonoBehaviour:
   - {fileID: 6484903422348809168}
   - {fileID: 511311663776528063}
   cam: {fileID: 1873593961976660247}
-  lookSway: 0.4
-  moveSway: 1
-  gun1: {fileID: 0}
-  gun2: {fileID: 0}
-  bobSpeed: 8
-  posBob: 0.005
-  rotBob: 2
-  sprintFOV: 105
-  sprintBobSpeed: 9
-  sprintPosBob: 0.04
-  sprintRotBob: 7
-  aimBobSpeed: 4
-  aimPosBob: 0.002
-  aimRotBob: 0
 --- !u!114 &7373343370299481131
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -917,35 +920,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
-  InterpolationSpace: 0
-  InterpolationTarget: {fileID: 9117754562266066061}
-  InterpolateErrorCorrection: 1
-  InterpolatedErrorCorrectionSettings:
-    MinRate: 3.3
-    MaxRate: 10
-    PosBlendStart: 0.25
-    PosBlendEnd: 1
-    PosMinCorrection: 0.025
-    PosTeleportDistance: 2
-    RotBlendStart: 0.1
-    RotBlendEnd: 0.5
-    RotTeleportRadians: 1.5
-  UseLegacySharedModeInterpolation: 0
-  TargetInterpolationDelay: 0.03
   _CurrentMoveSpeed: 0
-  cc: {fileID: 0}
+  kcc: {fileID: 0}
   sensitivity: 0.2
   currentSensitivity: 0
   localLook: {x: 0, y: 0}
   abdomen: {fileID: 5304003911758577349}
   chest: {fileID: 8939402052696638201}
   head: {fileID: 6229061859744471449}
-  groundCheck: {fileID: 3401456224725798835}
-  groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
   jumpForce: 5
-  gravity: -14.715
 --- !u!114 &8687896442830934809
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1003,32 +986,85 @@ MonoBehaviour:
     m_NumAlphaKeys: 2
   fill: {fileID: 4367730749024254378}
   FPSCap: -1
---- !u!143 &627049393995240112
-CharacterController:
+--- !u!54 &5500605181910046035
+Rigidbody:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2404348447143437924}
-  m_Material: {fileID: 0}
+  serializedVersion: 4
+  m_Mass: 1
+  m_Drag: 0
+  m_AngularDrag: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
     m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 1
+  m_IsKinematic: 0
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 0
+--- !u!114 &832363380349901326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2404348447143437924}
   m_Enabled: 1
-  serializedVersion: 3
-  m_Height: 1.8
-  m_Radius: 0.2
-  m_SlopeLimit: 45
-  m_StepOffset: 0.3
-  m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 0.925, z: 0}
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f7684f04e649e84fb2ee1bc9fbee42d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _settings:
+    Shape: 1
+    IsTrigger: 0
+    Radius: 0.35
+    Height: 1.8
+    Extent: 0.035
+    Mass: 1
+    ColliderLayer: 0
+    CollisionLayerMask:
+      serializedVersion: 2
+      m_Bits: 8
+    RenderBehavior: 1
+    Features: -1
+    SuppressConvexMeshColliders: 0
+    SpawnColliderOnProxy: 1
+    AllowClientTeleports: 0
+    TeleportThreshold: 1
+    MaxMoveSteps: 1
+    CCDRadiusMultiplier: 0.75
+    AntiJitterDistance: {x: 0, y: 0}
+    GroundSnapDistance: 0.25
+    GroundSnapSpeed: 4
+    StepHeight: 0.3
+    StepDepth: 0.2
+    StepSpeed: 1
+    Processors:
+    - {fileID: 6733955975318150615, guid: 0b1fae6ab34a6e0478cb92d6e1a62e44, type: 3}
+    - {fileID: -3592675505127058418, guid: 93e6d39666b21fe4ea884554d8526c00, type: 3}
+    PositionAccuracy:
+      _value: 0.0001
+      _inverse: 0
+      _hash: -194233199
+    RotationAccuracy:
+      _value: 0.0001
+      _inverse: 0
+      _hash: -258202764
+    MaxNetworkedCollisions: 4
+    MaxNetworkedModifiers: 4
+    MaxNetworkedIgnores: 4
 --- !u!114 &6442570602906546450
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1096,6 +1132,7 @@ MonoBehaviour:
   - {fileID: -270113763915573476}
   - {fileID: 7373343370299481131}
   - {fileID: 8687896442830934809}
+  - {fileID: 832363380349901326}
   - {fileID: 6442570602906546450}
   SimulationBehaviours: []
 --- !u!1 &2411850001490916430
@@ -3813,6 +3850,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 6229061859744471449}
     m_Modifications:
+    - target: {fileID: 196181419410597977, guid: 5268045d68d188e64af1c90233787289,
+        type: 3}
+      propertyPath: cyclicRate
+      value: 800
+      objectReference: {fileID: 0}
     - target: {fileID: 5071889620270908730, guid: 5268045d68d188e64af1c90233787289,
         type: 3}
       propertyPath: Flags
@@ -4128,6 +4170,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7861634138272534908, guid: ce9377ca7f703bfb88963b3eb1afcd02,
+        type: 3}
+      propertyPath: cyclicRate
+      value: 650
       objectReference: {fileID: 0}
     - target: {fileID: 8643852421886043600, guid: ce9377ca7f703bfb88963b3eb1afcd02,
         type: 3}

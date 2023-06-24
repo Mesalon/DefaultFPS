@@ -15,7 +15,7 @@ public class ProjectileManager : NetworkBehaviour {
 	public GameObject ImpactEffect;
 	public Vector3 impactOffset;
 	Queue<GameObject> impactPool = new();
-
+	
 	private void Awake() {
 		inst = this;
 		projectileLibrary = Resources.LoadAll("ProjectileData").OfType<ProjectileData>().ToArray();
@@ -28,7 +28,9 @@ public class ProjectileManager : NetworkBehaviour {
 				p.UpdateProjectile(out bool destroyProjectile);
 				if (destroyProjectile && Runner.IsFirstTick && Runner.IsForward) {
 					p.isActive = false;
-					Instantiate(ImpactEffect, p.hitPosition, Quaternion.identity).GetComponent<VisualEffect>().Play();
+					if (p.hitPosition != Vector3.zero) {
+						Instantiate(ImpactEffect, p.hitPosition, Quaternion.identity).GetComponent<VisualEffect>().Play();
+					}
 				}
 				projectiles.Set(i, p);
 			}

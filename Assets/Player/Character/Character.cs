@@ -77,7 +77,7 @@ public class Character : NetworkBehaviour {
         handling.gun.transform.SetParent(null);*/
         Transform[] rags = Instantiate(ragdoll, transform.position, transform.rotation).GetComponent<Ragdoll>().rags;
         for (int i = 0; i < bones.Length; i++) { rags[i].localRotation = bones[i].localRotation; }
-        rags[0].GetComponent<Rigidbody>().AddForce(locomotion.cc.velocity + dmgSource.hitNormal * dmgSource.hitForce);
+        rags[0].GetComponent<Rigidbody>().AddForce(locomotion.kcc.Data.RealVelocity + dmgSource.hitNormal * dmgSource.hitForce);
         Runner.Despawn(Object, true);
     }
     
