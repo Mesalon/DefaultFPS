@@ -18,9 +18,7 @@ public class UI : NetworkBehaviour {
     [SerializeField] TMP_Text redTeamKills;
     [SerializeField] TMP_Text blueTeamKills;
     [SerializeField] float fpsAverageDepth;
-    [SerializeField] Slider healthSlider;
-    [SerializeField] Gradient gradient;
-    [SerializeField] Image fill;
+    public TMP_Text healthText;
     [SerializeField] int FPSCap = -1;
     private Queue<float> deltaTimes = new();
     private Character character;
@@ -33,16 +31,10 @@ public class UI : NetworkBehaviour {
         if (Object.HasInputAuthority) {
             nametagText.gameObject.SetActive(false);
         }
-
-        healthSlider.maxValue = character.maxHealth;
-        healthSlider.value = character.Health;
-        fill.color = gradient.Evaluate(healthSlider.normalizedValue);
     }
 
     public override void Render() {
         if (Object.HasInputAuthority) {
-            healthSlider.value = character.Health;
-            fill.color = gradient.Evaluate(healthSlider.normalizedValue);
             ammoCounter.text = $"{character.handling.equippedGun.Ammo} / {character.handling.equippedGun.ReserveAmmo}";
             Application.targetFrameRate = FPSCap;
         }else { // Nametags
@@ -69,11 +61,11 @@ public class UI : NetworkBehaviour {
         GUI.Label(new Rect(5, 5, 100, 25), "FPS: " + System.Math.Round(1 / (avg / fpsAverageDepth), 1));
     }
     
-    public void IndicateKill(Character victim) {
+    public void IndicateKill(Character victim, Firearm Weapon, float distance) {
         IEnumerator CR() {
-            killIndicator.text = $"KILL - {victim.Player.Name}";
+            killIndicator.text = $"KILLED { victim.Player.Name } {Weapon.name} {Mathf.RoundToInt(distance)}m";
             killIndicator.gameObject.SetActive(true);
-            yield return new WaitForSeconds(1.5f);
+            yield return new WaitForSeconds(3f);
             killIndicator.gameObject.SetActive(false);
         }
         StartCoroutine(CR());

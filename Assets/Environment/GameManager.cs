@@ -14,12 +14,19 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	public Camera mainCamera;
 	public Camera activeCamera;
 	public static List<Transform> spawns = new();
+	public Player localPlayer;
 
 	[SerializeField] private TMP_InputField nameField;
 	[SerializeField] private TMP_Text nameText;
 	[SerializeField] private Transform spawnHolder;
 	[SerializeField] private NetworkPrefabRef playerPF;
-	
+
+	//stuff which needs to be accesible from anywhere anytime,
+	//game manager is the most convenient script for this although it should probably be moved at some point
+	//these libraries still exist in the handling script, i was too lazy to delete them
+	public List<Firearm> gun1Library;
+	public List<Firearm> gun2Library;
+
 	private void Awake() {
 		if (!inst) { inst = this; }
 		else if (inst != this) { Destroy(gameObject); }
@@ -47,6 +54,7 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 			NetworkObject playerObject = runner.Spawn(playerPF, Vector3.zero, Quaternion.identity, player);
 			Runner.SetPlayerObject(player, playerObject);
 		}
+		localPlayer = Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>();
 	}
 
 	public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
@@ -67,6 +75,16 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		if(activeCamera) { activeCamera.gameObject.SetActive(false); }
 		cam.gameObject.SetActive(true);
 		activeCamera = cam;
+	}
+
+	public void AssignPrimaryGun(int index) {
+		AttachmentEditor.ClearPrimaryAttachments();
+		Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>().gun1 = index;
+	}
+
+	public void AssignSecondaryGun(int index) {
+		AttachmentEditor.ClearSecondaryAttachments();
+		Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>().gun2 = index;
 	}
 	#region stubs
 	public void OnInput(NetworkRunner runner, NetworkInput input) { }

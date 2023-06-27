@@ -2,6 +2,7 @@ using UnityEngine;
 using System;
 using System.Collections.Generic;
 using Fusion;
+using UnityEngine.VFX;
 
 public enum WeaponClass { Rifle, Pistol, }
 public class Firearm : NetworkBehaviour {
@@ -27,7 +28,11 @@ public class Firearm : NetworkBehaviour {
     public float aimingSpeedMult = 0.75f;
     public float runningSpeedMult = 1.25f;
     public float weight; // Affects handling speed
-    [SerializeField] private List<AttachmentMount> attachmentMounts;
+    public VisualEffect muzzleFlash;
+    public List<AttachmentMount> attachmentMounts;
+    public List<GripAttachment> compatibleGrips;
+    public List<OpticAttachment> compatibleOptics;
+    public List<MuzzleAttachment> compatibleMuzzles;
     [SerializeField] ProjectileData projectile;
     [SerializeField] AudioClip fireSound;
     [SerializeField] AudioClip reloadSound;
@@ -42,6 +47,31 @@ public class Firearm : NetworkBehaviour {
 
     void Awake() {
         audio = GetComponent<AudioSource>();
+        if(type == WeaponClass.Rifle) {
+            foreach(Attachment attachment in Runner.GetPlayerObject(Object.InputAuthority).GetComponent<Player>().gun1Attachments) {
+                if(attachment.GetType() == typeof(GripAttachment)) {
+                    attachmentMounts[2].attachment = attachment;
+                }
+                if (attachment.GetType() == typeof(OpticAttachment)) {
+                    attachmentMounts[0].attachment = attachment;
+                }
+                if (attachment.GetType() == typeof(MuzzleAttachment)) {
+                    attachmentMounts[1].attachment = attachment;
+                }
+            }
+        } else {
+            foreach (Attachment attachment in Runner.GetPlayerObject(Object.InputAuthority).GetComponent<Player>().gun2Attachments) {
+                if (attachment.GetType() == typeof(GripAttachment)) {
+                    attachmentMounts[2].attachment = attachment;
+                }
+                if (attachment.GetType() == typeof(OpticAttachment)) {
+                    attachmentMounts[0].attachment = attachment;
+                }
+                if (attachment.GetType() == typeof(MuzzleAttachment)) {
+                    attachmentMounts[1].attachment = attachment;
+                }
+            }
+        }
         foreach (AttachmentMount mount in attachmentMounts) {
             if (mount.attachment) {
                 Instantiate(mount.attachment, mount.transform).Initalize(this); 
@@ -92,18 +122,16 @@ public class Firearm : NetworkBehaviour {
         }
     }
     
-    public static void OnFire(Changed<Firearm> changed) {
-        Firearm f = changed.Behaviour;
-        f.audio.PlayOneShot(f.fireSound);
-        
+    public static void FireFX(Changed<Firearm> changed) {
+        changed.Behaviour.audio.PlayOneShot(changed.Behaviour.fireSound);
+        VisualEffect fx = changed.Behaviour.muzzleFlash;
         Vector2 finalRecoil = new(-f.Recoil.recoilY, f.RecoilYaw);
         f.owner.handling.currentCamRecoil += finalRecoil;
         f.owner.handling.currentPosRecoil += finalRecoil * f.Recoil.posRecoilMult;
         f.owner.handling.currentRotRecoil += finalRecoil * f.Recoil.rotRecoilMult;
-        /*VisualEffect fx = changed.Behaviour.muzzleFlash.GetComponent<VisualEffect>(); Fuck you
         fx.pause = false;
         fx.playRate = 0.01f;
-        fx.Play();*/
+        fx.Play();
     }
     
     public static void ReloadFX(Changed<Firearm> changed) {

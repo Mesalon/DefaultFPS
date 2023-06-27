@@ -26,8 +26,8 @@ public class Handling : NetworkBehaviour {
     [SerializeField] Transform head;
     [SerializeField] Transform riflePose, rifleSprintPose;
     [SerializeField] Transform pistolPose, pistolSprintPose;
-    [SerializeField] List<Firearm> gun1Library;
-    [SerializeField] List<Firearm> gun2Library;
+    public List<Firearm> gun1Library;
+    public List<Firearm> gun2Library;
     [SerializeField] Camera cam;
     private KCC kcc;
     private Locomotion locomotion;

@@ -89,10 +89,11 @@ public class Character : NetworkBehaviour {
     
     public static void OnHealthChanged(Changed<Character> changed) {
         Character c = changed.Behaviour;
+        c.UI.healthText.text = c.Health.ToString();
         if (c.Health <= 0) { // Die
             if (c.dmgSource.attacker.IsValid) {
                 Character atk = GameManager.GetPlayer(c.dmgSource.attacker).character;
-                atk.UI.IndicateKill(c);
+                atk.UI.IndicateKill(c, c.handling.equippedGun, Vector3.Distance(atk.transform.position, c.transform.position));
                 if (atk.Player.team == Team.Red) { GameManager.inst.redTeamKills++; }
                 else { GameManager.inst.blueTeamKills++; }
                 atk.Player.Kills++;
