@@ -77,9 +77,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61bd34a9bab56338ea12af61ea65656d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grabPoint: {fileID: 1417498658566210677}
+  type: 2
+  weight: 0.1
+  id: 5
   recoilMod:
-    modifiers: []
     camSpeed: 0
     posSpeed: 0
     rotSpeed: 0
@@ -91,6 +92,7 @@ MonoBehaviour:
     stability: 0
     posRecoilMult: 0
     rotRecoilMult: 0
+  grabPoint: {fileID: 1417498658566210677}
 --- !u!1001 &6790611191493813118
 PrefabInstance:
   m_ObjectHideFlags: 0

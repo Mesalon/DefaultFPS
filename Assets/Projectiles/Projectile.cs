@@ -15,11 +15,11 @@ public struct  Projectile : INetworkStruct {
 
     public Projectile(int dataIndex, PlayerRef owner, Vector3 position, Vector3 direction, int fireTick, float lifespan, NetworkRunner runner) {
         isActive = true;
-        this.dataIndex = dataIndex;
         firePosition = position;
+        finishTick = runner.Tick + Mathf.RoundToInt(lifespan / runner.DeltaTime);
+        this.dataIndex = dataIndex;
         this.owner = owner;
         this.fireTick = fireTick;
-        finishTick = runner.Tick + Mathf.RoundToInt(lifespan / runner.DeltaTime);
         this.direction = direction;
         hitPosition = Vector3.zero;
     }
@@ -36,9 +36,15 @@ public struct  Projectile : INetworkStruct {
         destroyProjectile = false;
         // Apply forces
         var lastPosition = GetMovePosition(Runner.Tick - 1f);
-        var Position = GetMovePosition(Runner.Tick);
+        var position = GetMovePosition(Runner.Tick);
 
-        if (Runner.LagCompensation.Raycast(lastPosition, Position - lastPosition, Vector3.Distance(Position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX, layerMask: ProjectileManager.inst.projectileMask)) {
+        ProjectileData data = ProjectileManager.inst.projectileLibrary[dataIndex];
+        if (data.showDebugTracers) {
+            float time = data.debugTracerTime == 0 ? Time.deltaTime : data.debugTracerTime;
+            Debug.DrawRay(lastPosition, position - lastPosition, data.debugTracerColor, time);
+        }
+        
+        if (Runner.LagCompensation.Raycast(lastPosition, position - lastPosition, Vector3.Distance(position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX, layerMask: ProjectileManager.inst.projectileMask)) {
             hitPosition = hit.Point;
             if (hit.Hitbox && hit.Hitbox.Root.TryGetComponent(out Character c)) {
                 c.Damage(new() {
@@ -53,14 +59,9 @@ public struct  Projectile : INetworkStruct {
         }
     }
 
-    public void DrawProjectile() {
+    public void DrawProjectile(int tick) {
         ProjectileData data = ProjectileManager.inst.projectileLibrary[dataIndex];
-        Graphics.DrawMesh(data.tracerMesh, Matrix4x4.TRS(GetMovePosition(Runner.Tick), Quaternion.LookRotation(direction), Vector3.one * 5), data.tracerMat, 0);
-        
-        /*if (data.showDebugTracers) {
-            float time = data.debugTracerTime == 0 ? Time.deltaTime : data.debugTracerTime;
-            Debug.DrawRay(lastPosition, position - lastPosition, data.debugTracerColor, time);
-        }*/
+        Graphics.DrawMesh(data.tracerMesh, Matrix4x4.TRS(GetMovePosition(tick), Quaternion.LookRotation(direction), Vector3.one * 5), data.tracerMat, 0);
     }
     
     public Vector3 GetMovePosition(float tick) {

@@ -39,10 +39,9 @@ public class ProjectileManager : NetworkBehaviour {
 
 
 	public override void Render() {
-		for (int i = 0; i < projectiles.Length - 1; i++) {
+		for (int i = 0; i < projectiles.Length-1; i++) {
 			Projectile p = projectiles[i];
-			if (p.isActive) { p.DrawProjectile(); }
-
+			if (p.isActive) { p.DrawProjectile(Mathf.RoundToInt((Object.IsProxy ? Runner.InterpolationRenderTime : Runner.SimulationRenderTime) / Runner.DeltaTime)); }
 		}
 	}
 

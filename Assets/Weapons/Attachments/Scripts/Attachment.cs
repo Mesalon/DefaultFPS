@@ -1,7 +1,13 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Attachment : MonoBehaviour {
-    public abstract void Initalize(Firearm f);
+public class Attachment : MonoBehaviour {
+    public AttachmentType type;
+    public float weight;
+    [HideInInspector] public int id;
+    [SerializeField] [Tooltip("Plus or minus, the effect of this attachment in percentage for each stat.")]
+    public RecoilStats recoilMod;
+
+    public virtual void Initalize(ref WeaponStats s) {
+        s.weight += weight;
+    }
 }

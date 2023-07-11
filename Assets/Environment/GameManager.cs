@@ -3,33 +3,43 @@ using Fusion.Sockets;
 using UnityEngine;
 using Fusion;
 using System;
+using System.Linq;
 using TMPro;
 
 public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
+	public static Player GetPlayer(PlayerRef player) => inst.Runner.GetPlayerObject(player).GetComponent<Player>();
+	public static Player LocalPlayer => GetPlayer(inst.Runner.LocalPlayer);
+	public static Firearm GetWeapon(int index) => gunLibrary[index];
+	public static Attachment GetAttachment(int index) => attachmentLibrary[index];
+	public static List<Firearm> gunLibrary = new();
+	public static List<Attachment> attachmentLibrary = new();
+
 	[Networked] public int redTeamKills { get; set; }
 	[Networked] public int blueTeamKills { get; set; }
-	
+
 	public static GameManager inst;
-	public static Player GetPlayer(PlayerRef player) => inst.Runner.GetPlayerObject(player).GetComponent<Player>();
 	public Camera mainCamera;
 	public Camera activeCamera;
 	public static List<Transform> spawns = new();
-	public Player localPlayer;
-
+	[SerializeField] private PlayerSetup loadouts;
 	[SerializeField] private TMP_InputField nameField;
 	[SerializeField] private TMP_Text nameText;
 	[SerializeField] private Transform spawnHolder;
 	[SerializeField] private NetworkPrefabRef playerPF;
 
-	//stuff which needs to be accesible from anywhere anytime,
-	//game manager is the most convenient script for this although it should probably be moved at some point
-	//these libraries still exist in the handling script, i was too lazy to delete them
-	public List<Firearm> gun1Library;
-	public List<Firearm> gun2Library;
-
 	private void Awake() {
 		if (!inst) { inst = this; }
 		else if (inst != this) { Destroy(gameObject); }
+		
+		GameObject[] firearms = Resources.LoadAll("Firearms").OfType<GameObject>().ToArray();
+		foreach (GameObject obj in firearms) { gunLibrary.Add(obj.GetComponent<Firearm>()); }
+		GameObject[] attachments = Resources.LoadAll("Attachments").OfType<GameObject>().ToArray();
+		for (int i = 0; i < attachments.Length; i++) {
+			Attachment attachment = attachments[i].GetComponent<Attachment>();
+			attachment.id = i;
+			attachmentLibrary.Add(attachment);
+		}
+		
 		foreach (Transform child in spawnHolder) { spawns.Add(child); }
 		
 		nameField.onSubmit.AddListener(input => {
@@ -54,13 +64,12 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 			NetworkObject playerObject = runner.Spawn(playerPF, Vector3.zero, Quaternion.identity, player);
 			Runner.SetPlayerObject(player, playerObject);
 		}
-		localPlayer = Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>();
 	}
 
 	public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
 		if (Runner.IsServer) {
 			runner.Despawn(Runner.GetPlayerObject(player));
-			Character c = Runner.GetPlayerObject(player).GetComponent<Player>().character;
+			Character c = Runner.GetPlayerObject(player).GetComponent<Player>().Character;
 			if (c) { c.Health = 0; }
 			Runner.SetPlayerObject(player, null);
 		}
@@ -68,7 +77,15 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	}
 
 	public void SpawnCharacterHook() {
-		Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>().RPC_SpawnCharacter(spawns[new NetworkRNG(Runner.Tick).RangeInclusive(0, spawns.Count)].position, Runner.LocalPlayer);
+		WeaponConfiguration[] weapons = new WeaponConfiguration[2];
+		for (int i = 0; i < weapons.Length; i++) {
+			weapons[i].id = loadouts.lastWeapons[i].id;
+			for (int i2 = 0; i2 < loadouts.lastWeapons[i].mountOptions.Count; i2++) {
+				AttachmentMount mount = loadouts.lastWeapons[i].mountOptions[i2].mount;
+				weapons[i].Attachments.Set(i2, mount.preview ? mount.preview.id : -1);
+			}
+		}
+		LocalPlayer.RPC_SpawnCharacter(spawns[new NetworkRNG(Runner.Tick).RangeInclusive(0, spawns.Count - 1)].position, weapons);
 	}
 
 	public void SwitchCamera(Camera cam) {
@@ -76,16 +93,7 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		cam.gameObject.SetActive(true);
 		activeCamera = cam;
 	}
-
-	public void AssignPrimaryGun(int index) {
-		AttachmentEditor.ClearPrimaryAttachments();
-		Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>().gun1 = index;
-	}
-
-	public void AssignSecondaryGun(int index) {
-		AttachmentEditor.ClearSecondaryAttachments();
-		Runner.GetPlayerObject(Runner.LocalPlayer).GetComponent<Player>().gun2 = index;
-	}
+	
 	#region stubs
 	public void OnInput(NetworkRunner runner, NetworkInput input) { }
 	public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }
@@ -104,7 +112,4 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	#endregion
 }
 
-public enum Team {
-	Red,
-	Blue
-}
+public enum Team { Red, Blue }

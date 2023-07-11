@@ -2,10 +2,10 @@ using UnityEngine;
 using Fusion;
 
 public class Character : NetworkBehaviour {
+    [Networked] public Player Player { get; set; }
     [HideInInspector, Networked(OnChanged = nameof(OnHealthChanged))] public float Health { get; set; }
     [Networked] NetworkInputData LastInput { get; set; }
     [Networked] DamageSource dmgSource { get; set; } // Most recent damage source
-    public Player Player => GameManager.GetPlayer(Object.InputAuthority);
     public float maxHealth;
     [HideInInspector] public Handling handling;
     [SerializeField] Camera cam;
@@ -37,16 +37,18 @@ public class Character : NetworkBehaviour {
         data.buttons.Set(Buttons.Weapon2, controls.Player.Secondary.ReadValue<float>() == 1);
         data.movement = controls.Player.Move.ReadValue<Vector2>();
         data.lookDelta = locomotion.localLook;
-        data.muzzlePos = handling.equippedGun.muzzlePoint.position;
-        data.muzzleDir = handling.equippedGun.muzzlePoint.forward;
+        if (Object.IsValid) {
+            data.muzzlePos = handling.Gun.muzzlePoint.position;
+            data.muzzleDir = handling.Gun.muzzlePoint.forward;
+        }
         locomotion.localLook = Vector2.zero; // Consume that mother fucker
         input.Set(data);
     }
-
+    
     public override void Spawned() {
-        Player.character = this;
+        Player.Character = this;
         Health = maxHealth;
-
+        
         if (Object.HasInputAuthority) {
             name = "Client";
             Cursor.lockState = CursorLockMode.Locked;
@@ -59,6 +61,7 @@ public class Character : NetworkBehaviour {
         }
     }
 
+    
     public override void FixedUpdateNetwork() {
         if (GetInput(out NetworkInputData input)) {
             if (input.buttons.WasPressed(LastInput.buttons, Buttons.Kill)) { Health = 0; }
@@ -73,8 +76,6 @@ public class Character : NetworkBehaviour {
         }
         
         Player.Deaths++;
-        /*handling.gun.Active = false; todo: Fix this shit
-        handling.gun.transform.SetParent(null);*/
         Transform[] rags = Instantiate(ragdoll, transform.position, transform.rotation).GetComponent<Ragdoll>().rags;
         for (int i = 0; i < bones.Length; i++) { rags[i].localRotation = bones[i].localRotation; }
         rags[0].GetComponent<Rigidbody>().AddForce(locomotion.kcc.Data.RealVelocity + dmgSource.hitNormal * dmgSource.hitForce);
@@ -82,7 +83,6 @@ public class Character : NetworkBehaviour {
     }
     
     public void Damage(DamageSource source, float amount) {
-        // todo: Implement DamageSource struct with more detailed information like weapon, distance, etc
         dmgSource = source;
         Health = Mathf.Clamp(Health - amount, 0, maxHealth);
     }
@@ -92,8 +92,8 @@ public class Character : NetworkBehaviour {
         c.UI.healthText.text = c.Health.ToString();
         if (c.Health <= 0) { // Die
             if (c.dmgSource.attacker.IsValid) {
-                Character atk = GameManager.GetPlayer(c.dmgSource.attacker).character;
-                atk.UI.IndicateKill(c, c.handling.equippedGun, Vector3.Distance(atk.transform.position, c.transform.position));
+                Character atk = GameManager.GetPlayer(c.dmgSource.attacker).Character;
+                atk.UI.IndicateKill(c, c.handling.Gun, Vector3.Distance(atk.transform.position, c.transform.position));
                 if (atk.Player.team == Team.Red) { GameManager.inst.redTeamKills++; }
                 else { GameManager.inst.blueTeamKills++; }
                 atk.Player.Kills++;
@@ -103,7 +103,6 @@ public class Character : NetworkBehaviour {
     }
 }
 
-public enum WeaponRole { Primary, Secondary }
 /*anim.SetFloat("MoveX", LastInput.movement.x, 0.1f, Time.deltaTime);
 anim.SetFloat("MoveZ", LastInput.movement.y, 0.1f, Time.deltaTime);
 anim.SetFloat("Aim", LastInput.buttons.IsSet(Buttons.Aim) ? 1 : 0, 0.1f, Time.deltaTime);*/

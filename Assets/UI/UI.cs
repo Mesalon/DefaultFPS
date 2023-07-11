@@ -23,7 +23,7 @@ public class UI : NetworkBehaviour {
     private Queue<float> deltaTimes = new();
     private Character character;
 
-    private void Awake() {
+    private void Awake() { 
         character = GetComponent<Character>();
     }
 
@@ -35,9 +35,9 @@ public class UI : NetworkBehaviour {
 
     public override void Render() {
         if (Object.HasInputAuthority) {
-            ammoCounter.text = $"{character.handling.equippedGun.Ammo} / {character.handling.equippedGun.ReserveAmmo}";
+            ammoCounter.text = $"{character.handling.Gun.Ammo} / {character.handling.Gun.ReserveAmmo}";
             Application.targetFrameRate = FPSCap;
-        }else { // Nametags
+        } else { // Nametags
             nametagText.text = character.Player.Name.ToString();
             Transform activeCam = GameManager.inst.activeCamera.transform;
             float angle = Vector3.Angle(activeCam.forward, (nametagAimPoint.position - activeCam.position).normalized);

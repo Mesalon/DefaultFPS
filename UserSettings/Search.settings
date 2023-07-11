@@ -21,6 +21,9 @@ scopes = {
 	"last_search.45C55C1A" = ""
 	"OpenInspectorPreview.45C55C1A" = "0"
 	"currentGroup.45C55C1A" = "asset"
+	"last_search.8DF93126" = "w"
+	"OpenInspectorPreview.8DF93126" = "0"
+	"currentGroup.8DF93126" = null
 }
 providers = {
 	asset = {
@@ -76,13 +79,13 @@ recentSearches = [
 searchItemFavorites = [
 ]
 savedSearchesSortOrder = 0
-showSavedSearchPanel = false
+showSavedSearchPanel = true
 hideTabs = false
 expandedQueries = [
 ]
 queryBuilder = false
 ignoredProperties = "id;name;classname;imagecontentshash"
-helperWidgetCurrentArea = "all"
+helperWidgetCurrentArea = "="
 disabledIndexers = ""
 minIndexVariations = 2
 findProviderIndexHelper = true

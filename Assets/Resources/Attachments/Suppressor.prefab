@@ -46,9 +46,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f3ce6437db9aeacb86dac21faf3750b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  exit: {fileID: 4182908997879773840}
+  type: 4
+  weight: 0.2
+  id: 4
   recoilMod:
-    modifiers: []
     camSpeed: 0
     posSpeed: 0
     rotSpeed: 0
