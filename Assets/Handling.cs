@@ -51,7 +51,9 @@ public class Handling : NetworkBehaviour {
 
     private Pose lastNetPose;
     private float interpClock;
-    
+    [SerializeField] private float lookSwayFactor;
+    [SerializeField] private float lookSwayRecovery;
+
     private void Awake() {
         character = GetComponent<Character>();
         locomotion = GetComponent<Locomotion>();
@@ -158,11 +160,15 @@ public class Handling : NetworkBehaviour {
         gunBobPose.position = Vector3.SmoothDamp(gunBobPose.position, bobPosTarget, ref velV2, 0.1f);
         gunBobPose.rotation = RotationSmoothDamp(gunBobPose.rotation, bobRotTarget, ref velQ2, 0.1f);
         
-        // Weapon Sway
+        // Move Sway
         Vector3 moveDelta = lastMove - new Vector3(LastInput.movement.x, kcc.FixedData.RealVelocity.y, LastInput.movement.y);
         moveSwayDebt += moveSway * new Vector3(-moveDelta.z - moveDelta.y * 0.5f, moveDelta.x, 0);
         moveSwayDebt = Vector3.MoveTowards(moveSwayDebt, Vector3.zero, Time.deltaTime * moveSwayRecovery);
         gunMoveSway = Vector3.SmoothDamp(gunMoveSway, moveSwayDebt, ref velV4, 0.15f);
+        
+        // Look Sway
+        Quaternion lookSwayTarget = Quaternion.Euler(lookSwayFactor * -(kcc.RenderData.GetLookRotation(true, true) - lastLook)); 
+        gunLookSway = RotationSmoothDamp(gunLookSway, lookSwayTarget, ref velQ5, lookSwayRecovery); 
         
         // Weapon Recoil 
         Vector2 appliedPosRecoil = currentPosRecoil * Gun.Recoil.posSpeed * Time.deltaTime;
@@ -182,7 +188,7 @@ public class Handling : NetworkBehaviour {
         gunHandlePose.rotation = RotationSmoothDamp(gunHandlePose.rotation, gunPoseTarget.rotation, ref velQ1, poseTime);
         
         Gun.transform.localPosition = gunHandlePose.position + gunBobPose.position + gunRecoilPose.position;
-        Gun.transform.localRotation = gunHandlePose.rotation * gunBobPose.rotation * Quaternion.Euler(gunMoveSway) * gunRecoilPose.rotation;
+        Gun.transform.localRotation = gunHandlePose.rotation * gunBobPose.rotation * Quaternion.Euler(gunMoveSway) * gunLookSway * gunRecoilPose.rotation;
 
         lastMove = new(LastInput.movement.x, kcc.FixedData.RealVelocity.y, LastInput.movement.y);
         lastLook = kcc.RenderData.GetLookRotation(true, true);

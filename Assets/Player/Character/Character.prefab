@@ -489,9 +489,9 @@ MonoBehaviour:
   maxPoseTime: 0.8
   minBobSpeed: 5
   maxBobSpeed: 20
-  minMoveSwayX: 0
-  maxMoveSwayX: 0
-  moveSwayRecoveryBaseX: 4
+  minMoveSwayX: 2
+  maxMoveSwayX: 5
+  moveSwayRecoveryBaseX: 3
   sprintFOVX: 1.15
   sprintBobSpeedX: 1.25
   sprintPosBobX: 5
@@ -500,13 +500,15 @@ MonoBehaviour:
   aimPosBobX: 0.1
   aimRotBobX: 0.01
   aimMoveSwayX: 0.25
-  aimMoveSwayRecoveryX: 2
+  aimMoveSwayRecoveryX: 1.5
   riflePose: {fileID: 4122668644934832065}
   rifleSprintPose: {fileID: 266448692937990675}
   head: {fileID: 6229061859744471449}
   pistolPose: {fileID: 4580113990053242515}
   pistolSprintPose: {fileID: 7810944075373396810}
   cam: {fileID: 1873593961976660247}
+  lookSwayFactor: 2.5
+  lookSwayRecovery: 0.1
 --- !u!114 &7373343370299481131
 MonoBehaviour:
   m_ObjectHideFlags: 0
