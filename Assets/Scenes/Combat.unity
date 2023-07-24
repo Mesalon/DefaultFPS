@@ -668,10 +668,12 @@ MonoBehaviour:
   _blueTeamKills: 0
   mainCamera: {fileID: 1357258505}
   activeCamera: {fileID: 0}
+  menuProfile: {fileID: 11400000, guid: 1933aacee04ea0aa3b3dcb66844de00c, type: 2}
   loadouts: {fileID: 1357258507}
   nameField: {fileID: 680779733}
   nameText: {fileID: 1021415710}
   spawnHolder: {fileID: 638943493}
+  postProcessing: {fileID: 217863810}
   playerPF:
     RawGuidValue: a04a6d9f1217b508c82780a9b2e15bdb
 --- !u!4 &432188709
@@ -2969,7 +2971,7 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
+  near clip plane: 0.01
   far clip plane: 1000
   field of view: 60
   orthographic: 0

@@ -2418,6 +2418,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bde62658624dd8b65b92aa965180078d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WordOffset: 0
+  WordCount: 0
   _interpolationDataSource: 0
   _Owner: {fileID: 0}
   _TriggerState:
@@ -2456,7 +2458,7 @@ MonoBehaviour:
     recoilY: 2.5
     minRecoilX: -2
     maxRecoilX: 2
-    stability: 0.9
+    stability: 0.95
     posRecoilMult: 0.015
     rotRecoilMult: 2.5
 --- !u!114 &5071889620270908730

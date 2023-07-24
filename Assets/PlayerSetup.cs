@@ -118,7 +118,7 @@ public class PlayerSetup : MonoBehaviour {
         Firearm gun = GameManager.GetWeapon(selectedOption.id);
         WeaponStats stats = gun.stats; 
         
-        // todo: Find a better way to do this shit.
+        // todo: Use instances of Firearm instead of this dogshit.
         // Gotta make a phantom copy (Phantom forces reference) cause some of these are fucking refereces and attachments will modify the prefab if I don't
         ProjectileData oldProjectile = stats.projectile;
         stats.projectile = ScriptableObject.CreateInstance<ProjectileData>();

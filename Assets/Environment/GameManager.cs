@@ -5,26 +5,33 @@ using Fusion;
 using System;
 using System.Linq;
 using TMPro;
+using UnityEngine.Rendering;
 
 public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	public static Player GetPlayer(PlayerRef player) => inst.Runner.GetPlayerObject(player).GetComponent<Player>();
 	public static Player LocalPlayer => GetPlayer(inst.Runner.LocalPlayer);
 	public static Firearm GetWeapon(int index) => gunLibrary[index];
-	public static Attachment GetAttachment(int index) => attachmentLibrary[index];
+	public static Attachment GetAttachment(int index) {
+		print($"Trying to get {index}");
+		return attachmentLibrary[index];
+	}
+
 	public static List<Firearm> gunLibrary = new();
 	public static List<Attachment> attachmentLibrary = new();
-
+	
 	[Networked] public int redTeamKills { get; set; }
 	[Networked] public int blueTeamKills { get; set; }
 
 	public static GameManager inst;
 	public Camera mainCamera;
 	public Camera activeCamera;
-	public static List<Transform> spawns = new();
+	public VolumeProfile menuProfile;
+	private static List<Transform> spawns = new();
 	[SerializeField] private PlayerSetup loadouts;
 	[SerializeField] private TMP_InputField nameField;
 	[SerializeField] private TMP_Text nameText;
 	[SerializeField] private Transform spawnHolder;
+	[SerializeField] private Volume postProcessing;
 	[SerializeField] private NetworkPrefabRef playerPF;
 
 	private void Awake() {
@@ -46,11 +53,12 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 			GetPlayer(Runner.LocalPlayer).RPC_SetName(input);
 			nameField.text = "";
 		});
+		
+		SwitchCamera(mainCamera, menuProfile);
 	}
 
 	public override void Spawned() {
 		Runner.AddCallbacks(this);
-		SwitchCamera(mainCamera);
 	}
 
 	public override void Render() {
@@ -88,10 +96,11 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		LocalPlayer.RPC_SpawnCharacter(spawns[new NetworkRNG(Runner.Tick).RangeInclusive(0, spawns.Count - 1)].position, weapons);
 	}
 
-	public void SwitchCamera(Camera cam) {
+	public void SwitchCamera(Camera cam, VolumeProfile postFX = null) {
 		if(activeCamera) { activeCamera.gameObject.SetActive(false); }
 		cam.gameObject.SetActive(true);
 		activeCamera = cam;
+		if (postFX) { postProcessing.profile = postFX; }
 	}
 	
 	#region stubs

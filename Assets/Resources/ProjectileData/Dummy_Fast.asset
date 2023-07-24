@@ -22,6 +22,6 @@ MonoBehaviour:
   ricochetDamping: 0
   penetration: 0
   impact: {fileID: 0}
-  showDebugTracers: 0
+  showDebugTracers: 1
   debugTracerTime: 1
   debugTracerColor: {r: 1, g: 1, b: 1, a: 1}

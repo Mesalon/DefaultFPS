@@ -1,11 +1,11 @@
 using UnityEngine;
 using Fusion;
 
-public struct  Projectile : INetworkStruct {
+public struct Projectile : INetworkStruct {
     private NetworkRunner Runner => ProjectileManager.inst.Runner;
     public bool isActive;
     public int dataIndex;
-    private PlayerRef owner;
+    public PlayerRef owner;
     public Vector3 firePosition { get; }
     public Vector3 direction;
     public int fireTick;
@@ -44,18 +44,17 @@ public struct  Projectile : INetworkStruct {
             Debug.DrawRay(lastPosition, position - lastPosition, data.debugTracerColor, time);
         }
         
-        if (Runner.LagCompensation.Raycast(lastPosition, position - lastPosition, Vector3.Distance(position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX, layerMask: ProjectileManager.inst.projectileMask)) {
+        if (Runner.LagCompensation.Raycast(lastPosition, position - lastPosition, Vector3.Distance(position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority, layerMask: ProjectileManager.inst.projectileMask)) {
             hitPosition = hit.Point;
+            destroyProjectile = true;
             if (hit.Hitbox && hit.Hitbox.Root.TryGetComponent(out Character c)) {
                 c.Damage(new() {
                     attacker = owner,
                     hitNormal = hit.Normal,
-                }, ProjectileManager.inst.projectileLibrary[dataIndex].damage);
-                destroyProjectile = true;
+                    distance = Vector3.Distance(firePosition, position),
+                    hitForce = data.damage,
+                }, data.damage);
             }
-            else { // If it hit anything else
-                destroyProjectile = true;
-            }   
         }
     }
 

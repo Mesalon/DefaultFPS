@@ -54,6 +54,7 @@ MonoBehaviour:
   _Kills: 0
   _Deaths: 0
   _Character: {fileID: 0}
+  respawnTime: 15
   characterPF: {fileID: 6523042883888669111, guid: 93c56d1fd17104be29d7ea939e0bac0a,
     type: 3}
 --- !u!114 &1139018457521385856

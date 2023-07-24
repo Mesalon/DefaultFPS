@@ -61,9 +61,9 @@ public class UI : NetworkBehaviour {
         GUI.Label(new Rect(5, 5, 100, 25), "FPS: " + System.Math.Round(1 / (avg / fpsAverageDepth), 1));
     }
     
-    public void IndicateKill(Character victim, Firearm Weapon, float distance) {
+    public void IndicateKill(string victimName, string weaponName, float distance) {
         IEnumerator CR() {
-            killIndicator.text = $"KILLED { victim.Player.Name } {Weapon.name} {Mathf.RoundToInt(distance)}m";
+            killIndicator.text = $"KILLED {victimName} {weaponName} {distance}m";
             killIndicator.gameObject.SetActive(true);
             yield return new WaitForSeconds(3f);
             killIndicator.gameObject.SetActive(false);

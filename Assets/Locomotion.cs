@@ -27,10 +27,6 @@ public class Locomotion : NetworkKCCProcessor {
     private void OnEnable() { controls.Enable(); }
     private void OnDisable() { controls.Disable(); }
 
-    public override void Spawned() {
-        name = Object.InputAuthority.ToString();
-    }
-    
     public override void FixedUpdateNetwork() {
         if (GetInput(out NetworkInputData input)) {
             Vector3 inputDirection = kcc.Data.TransformRotation * new Vector3(input.movement.x, 0, input.movement.y);

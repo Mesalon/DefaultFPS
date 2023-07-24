@@ -8,6 +8,9 @@ public class Player : NetworkBehaviour {
     [HideInInspector, Networked] public int Kills { get; set; }
     [HideInInspector, Networked] public int Deaths { get; set; }
     [Networked] public Character Character { get; set; }
+    [Networked] public TickTimer RespawnTimer { get; set; }
+    
+    public float respawnTime;
     [SerializeField] Character characterPF;
 
     public override void Spawned() {
@@ -19,8 +22,12 @@ public class Player : NetworkBehaviour {
     public void RPC_SpawnCharacter(Vector3 position, WeaponConfiguration[] weapons) {
         if (Character) {
             Debug.LogError("Attempted to spawn character when not dead yet! This indicates a catastrophic blunder somewhere in code. You have to be an extremely retarded to let this happen . . .");
-        } else {
-            print($"Spawning character (Expand for loadout details)\nWeapon1 ID: {weapons[0].id}, Weapon1 attachments: {string.Join(", ", weapons[0].Attachments.ToArray())}\nWeapon2 ID: {weapons[1].id}, Weapon2 attachments: {string.Join(", ", weapons[1].Attachments.ToArray())}");
+        } 
+        else if (RespawnTimer.ExpiredOrNotRunning(Runner)) {
+            print($"Spawning character (Expand for loadout details)" +
+                  $"\nWeapon1 ID: {weapons[0].id}, Weapon1 attachments: {string.Join(", ", weapons[0].Attachments)}" +
+                  $"\nWeapon2 ID: {weapons[1].id}, Weapon2 attachments: {string.Join(", ", weapons[1].Attachments)}");
+            
             Character = Runner.Spawn(characterPF, position, Quaternion.identity, Object.InputAuthority, (_, o) => {
                 Character c = o.GetComponent<Character>();
                 c.Player = this;
@@ -46,5 +53,5 @@ public class Player : NetworkBehaviour {
 
 public struct WeaponConfiguration : INetworkStruct {
     public int id;
-    [Networked, Capacity(32)] public NetworkArray<int> Attachments { get; }
+    [Networked, Capacity(8)] public NetworkArray<int> Attachments { get; } 
 }

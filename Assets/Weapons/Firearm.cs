@@ -13,6 +13,16 @@ public enum WeaponLength { OneHand, TwoHand }
 [OrderBefore(typeof(Handling))]
 public class Firearm : NetworkBehaviour {
     public RecoilStats Recoil => baseRecoil.Mod(stats.recoilMods);
+    public List<Attachment> Attachments {
+        get {
+            List<Attachment> attachments = new();
+            for (int i = 0; i < attachmentCont.mounts.Count; i++) {
+                if(Configuration.Attachments[i] != -1) { attachments.Add(GameManager.GetAttachment(Configuration.Attachments[i])); }
+            }
+            return attachments;
+        }
+    }
+
     [Networked, HideInInspector] public Character Owner { get; set; }
     [Networked, HideInInspector] public WeaponConfiguration Configuration { get; set; }
     [Networked, HideInInspector] public NetworkBool TriggerState { get; set; }

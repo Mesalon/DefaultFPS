@@ -132,7 +132,6 @@ public class Handling : NetworkBehaviour {
             Firearm newGun = NewGunRole == WeaponRole.Primary ? Gun1 : Gun2;
             gunPoseTarget = new(awayPose.localPosition, awayPose.localRotation);
             poseTime = RemapWeight(newGun.stats.weight, 0.05f, 0.8f);
-            if(Object.IsProxy) { print($"Enemy gun role: {CurrentGunRole}, newgun: {newGun}, pos: {newGun.transform.position}");}
             if ((Gun.transform.position - awayPose.position).magnitude < 0.05f) { // Done switching
                 gunHandlePose = new(awayPose.localPosition, awayPose.localRotation);
                 Gun.gameObject.SetActive(false);

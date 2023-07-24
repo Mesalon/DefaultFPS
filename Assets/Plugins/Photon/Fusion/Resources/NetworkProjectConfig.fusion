@@ -69,10 +69,10 @@
         "ReliableDataTransferModes": 3
     },
     "NetworkConditions": {
-        "Enabled": false,
+        "Enabled": true,
         "DelayShape": 1,
-        "DelayMin": 0.01,
-        "DelayMax": 0.1,
+        "DelayMin": 0.2,
+        "DelayMax": 0.3,
         "DelayPeriod": 3.0,
         "DelayThreshold": 0.5,
         "AdditionalJitter": 0.01,
