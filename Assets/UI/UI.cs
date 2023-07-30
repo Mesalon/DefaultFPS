@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using FMODUnity;
 using UnityEngine.UI;
 using UnityEngine;
 using Fusion;
@@ -8,17 +9,18 @@ using TMPro;
 
 [OrderAfter(typeof(Character))]
 public class UI : NetworkBehaviour {
-    [SerializeField] Camera cam;
+    public TMP_Text healthText;
     [SerializeField] TMP_Text ammoCounter;
     [SerializeField] TMP_Text killIndicator;
-    [SerializeField] float showNametagAngle, hideNametagAngle;
     [SerializeField] TMP_Text nametagText;
     [SerializeField] Transform nametagPosition;
     [SerializeField] Transform nametagAimPoint;
     [SerializeField] TMP_Text redTeamKills;
     [SerializeField] TMP_Text blueTeamKills;
+    [SerializeField] private EventReference hitmarkSound;
+    [SerializeField] private Image hitmarker;
     [SerializeField] float fpsAverageDepth;
-    public TMP_Text healthText;
+    [SerializeField] float showNametagAngle, hideNametagAngle;
     [SerializeField] int FPSCap = -1;
     private Queue<float> deltaTimes = new();
     private Character character;
@@ -48,7 +50,7 @@ public class UI : NetworkBehaviour {
             nametagText.transform.position = point;
         }
 
-        //UI
+        // UI
         redTeamKills.text = GameManager.inst.redTeamKills.ToString();
         blueTeamKills.text = GameManager.inst.blueTeamKills.ToString();
     }
@@ -58,15 +60,16 @@ public class UI : NetworkBehaviour {
         if (deltaTimes.Count > fpsAverageDepth) { deltaTimes.Dequeue(); }
         float avg = 0;
         foreach (float time in deltaTimes) { avg += time; }
-        GUI.Label(new Rect(5, 5, 100, 25), "FPS: " + System.Math.Round(1 / (avg / fpsAverageDepth), 1));
+        GUI.Label(new Rect(5, 5, 100, 25), "FPS: " + Math.Round(1 / (avg / fpsAverageDepth), 1));
     }
-    
-    public void IndicateKill(string victimName, string weaponName, float distance) {
+
+    public void MarkHit(bool headshot) {
         IEnumerator CR() {
-            killIndicator.text = $"KILLED {victimName} {weaponName} {distance}m";
-            killIndicator.gameObject.SetActive(true);
-            yield return new WaitForSeconds(3f);
-            killIndicator.gameObject.SetActive(false);
+            hitmarker.color = headshot ? Color.red : Color.white;
+            RuntimeManager.PlayOneShotAttached(hitmarkSound, gameObject);
+            hitmarker.gameObject.SetActive(true);
+            yield return new WaitForSeconds(0.1f);
+            hitmarker.gameObject.SetActive(false);
         }
         StartCoroutine(CR());
     }

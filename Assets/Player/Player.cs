@@ -7,6 +7,7 @@ public class Player : NetworkBehaviour {
     [HideInInspector, Networked] public Team team { set; get; }
     [HideInInspector, Networked] public int Kills { get; set; }
     [HideInInspector, Networked] public int Deaths { get; set; }
+    [Networked] public int Score { get; set; }
     [Networked] public Character Character { get; set; }
     [Networked] public TickTimer RespawnTimer { get; set; }
     
@@ -35,7 +36,6 @@ public class Player : NetworkBehaviour {
                     Firearm f = o.GetComponent<Firearm>();
                     f.Configuration = weapons[0];
                     f.Owner = c;
-
                 });
                 
                 c.handling.Gun2 = Runner.Spawn(GameManager.GetWeapon(weapons[1].id), inputAuthority: Object.InputAuthority, onBeforeSpawned: (_, o) => {

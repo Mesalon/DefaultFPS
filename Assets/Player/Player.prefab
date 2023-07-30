@@ -45,6 +45,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 77c3df91c18fd53a0a24e7f4f68ba6ee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  WordOffset: 0
+  WordCount: 0
   _interpolationDataSource: 0
   _Name:
     _length: 0
@@ -54,7 +56,7 @@ MonoBehaviour:
   _Kills: 0
   _Deaths: 0
   _Character: {fileID: 0}
-  respawnTime: 15
+  respawnTime: 4
   characterPF: {fileID: 6523042883888669111, guid: 93c56d1fd17104be29d7ea939e0bac0a,
     type: 3}
 --- !u!114 &1139018457521385856

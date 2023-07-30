@@ -5,6 +5,7 @@ using System.Linq;
 using Fusion;
 using UnityEngine.Serialization;
 using UnityEngine.VFX;
+using FMODUnity;
 
 public enum WeaponRole { Primary, Secondary }
 public enum WeaponClass { AssaultRifle, Carbine, SubmachineGun, Pistol, }
@@ -41,7 +42,7 @@ public class Firearm : NetworkBehaviour {
     public WeaponRole role;
     public WeaponLength length;
 
-    [SerializeField] AudioClip fireSound;
+    [SerializeField] private EventReference mechSound;
     [SerializeField] AudioClip reloadSound;
     public RecoilStats baseRecoil;
     private AttachmentController attachmentCont;
@@ -54,7 +55,7 @@ public class Firearm : NetworkBehaviour {
     }
 
     private void Start() {
-        ProjectileData[] library = ProjectileManager.inst.projectileLibrary;
+        ProjectileData[] library = ProjectileManager.I.projectileLibrary;
         for (int i = 0; i < library.Length; i++) {
             if (library[i].name == stats.projectile.name) {
                 projectileIndex = i;
@@ -79,7 +80,7 @@ public class Firearm : NetworkBehaviour {
                     UnityEngine.Random.InitState(Runner.Tick);
                     RecoilYaw = Mathf.Clamp(Mathf.Lerp(UnityEngine.Random.Range(Recoil.minRecoilX, Recoil.maxRecoilX), RecoilYaw, Recoil.stability), Recoil.minRecoilX, Recoil.maxRecoilX);
                     FireTimer = TickTimer.CreateFromSeconds(Runner, 1 / (stats.cyclicRate / 60));
-                    ProjectileManager.inst.CreateProjectile(new(projectileIndex, Object.InputAuthority, input.muzzlePos, input.muzzleDir, Runner.Tick, 4, Runner));
+                    ProjectileManager.I.CreateProjectile(new(projectileIndex, Object.InputAuthority, input.muzzlePos, input.muzzleDir, Runner.Tick, 4, Runner));
                 }
             }
             else { DisconnectorState = false; }
@@ -97,15 +98,17 @@ public class Firearm : NetworkBehaviour {
     
     public static void OnFire(Changed<Firearm> changed) {
         Firearm f = changed.Behaviour;
-        f.audio.PlayOneShot(changed.Behaviour.fireSound);
-        f.muzzleFlash.pause = false;
-        f.muzzleFlash.playRate = 0.01f;
-        f.muzzleFlash.Play();
+        if (f.Runner.IsForward) {
+            RuntimeManager.PlayOneShot(ProjectileManager.I.projectileLibrary[f.projectileIndex].shotSound, f.muzzlePoint.position);
+            f.muzzleFlash.pause = false;
+            f.muzzleFlash.playRate = 0.01f;
+            f.muzzleFlash.Play();
         
-        Vector2 finalRecoil = new(-f.Recoil.recoilY, f.RecoilYaw);
-        f.Owner.handling.currentCamRecoil += finalRecoil;
-        f.Owner.handling.currentPosRecoil += finalRecoil * f.Recoil.posRecoilMult;
-        f.Owner.handling.currentRotRecoil += finalRecoil * f.Recoil.rotRecoilMult;
+            Vector2 finalRecoil = new(-f.Recoil.recoilY, f.RecoilYaw);
+            f.Owner.handling.currentCamRecoil += finalRecoil;
+            f.Owner.handling.currentPosRecoil += finalRecoil * f.Recoil.posRecoilMult;
+            f.Owner.handling.currentRotRecoil += finalRecoil * f.Recoil.rotRecoilMult;
+        }
     }
     
     public static void ReloadFX(Changed<Firearm> changed) {

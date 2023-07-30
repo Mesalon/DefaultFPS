@@ -6,13 +6,13 @@ using System;
 using System.Linq;
 using TMPro;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 
 public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	public static Player GetPlayer(PlayerRef player) => inst.Runner.GetPlayerObject(player).GetComponent<Player>();
 	public static Player LocalPlayer => GetPlayer(inst.Runner.LocalPlayer);
 	public static Firearm GetWeapon(int index) => gunLibrary[index];
 	public static Attachment GetAttachment(int index) {
-		print($"Trying to get {index}");
 		return attachmentLibrary[index];
 	}
 
@@ -102,7 +102,7 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		activeCamera = cam;
 		if (postFX) { postProcessing.profile = postFX; }
 	}
-	
+
 	#region stubs
 	public void OnInput(NetworkRunner runner, NetworkInput input) { }
 	public void OnInputMissing(NetworkRunner runner, PlayerRef player, NetworkInput input) { }

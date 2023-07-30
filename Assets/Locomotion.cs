@@ -1,7 +1,9 @@
+using System;
+using FMODUnity;
 using Fusion;
 using Fusion.KCC;
 using UnityEngine;
-
+using FMOD.Studio;
 [OrderBefore(typeof(KCC), typeof(Character), typeof(Handling), typeof(Firearm))]
 public class Locomotion : NetworkKCCProcessor {
     [HideInInspector, Networked] public float CurrentMoveSpeed { get; set; }
@@ -11,10 +13,12 @@ public class Locomotion : NetworkKCCProcessor {
     [HideInInspector] public float sensitivity;
     [HideInInspector] public float currentSensitivity;
     [HideInInspector] public Vector2 localLook;
+    [SerializeField] EventReference footsteps;
     [SerializeField] Transform abdomen, chest, head;
     [SerializeField] float jumpForce;
     private Controls controls;
-    private Quaternion startAbdomenRot, startChestRot, startHeadRot; 
+    private EventInstance footstepInst;
+    private Quaternion startAbdomenRot, startChestRot, startHeadRot;
     
     protected void Awake() {
         kcc = GetComponent<KCC>();
@@ -22,6 +26,7 @@ public class Locomotion : NetworkKCCProcessor {
         startChestRot = chest.localRotation;
         startHeadRot = head.localRotation;
         controls = new();
+        footstepInst = AudioManager.inst.CreateInstance(footsteps, transform);
     }
 
     private void OnEnable() { controls.Enable(); }
@@ -30,13 +35,12 @@ public class Locomotion : NetworkKCCProcessor {
     public override void FixedUpdateNetwork() {
         if (GetInput(out NetworkInputData input)) {
             Vector3 inputDirection = kcc.Data.TransformRotation * new Vector3(input.movement.x, 0, input.movement.y);
+            kcc.Data.KinematicSpeed = CurrentMoveSpeed; 
             kcc.SetInputDirection(inputDirection);
-            
             if (input.buttons.WasPressed(LastInput.buttons, Buttons.Jump)) { kcc.Jump(Vector3.up * jumpForce); }
-            
             LastInput = input;
         }
-        
+
         UpdateLook(input.lookDelta);
     }
 
@@ -46,6 +50,15 @@ public class Locomotion : NetworkKCCProcessor {
             Vector2 input = controls.Player.Look.ReadValue<Vector2>();
             localLook += new Vector2(-input.y, input.x) * currentSensitivity;
             UpdateLook(localLook);
+        }
+
+        RuntimeManager.AttachInstanceToGameObject(footstepInst, transform);
+        if (kcc.Data.RealVelocity != Vector3.zero && kcc.Data.IsGrounded) {
+            footstepInst.getPlaybackState(out PLAYBACK_STATE state);
+            if (state == PLAYBACK_STATE.STOPPED) { footstepInst.start(); }
+        }
+        else {
+            footstepInst.stop(STOP_MODE.ALLOWFADEOUT);
         }
     }
 

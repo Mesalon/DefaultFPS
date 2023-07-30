@@ -1,8 +1,10 @@
-using System;
-using UnityEngine;
-using Fusion;
-using Fusion.KCC;
+using System.Collections.Generic;
+using FMOD.Studio;
 using UnityEngine.Rendering;
+using UnityEngine;
+using Fusion.KCC;
+using FMODUnity;
+using Fusion;
 
 public class Character : NetworkBehaviour {
     [Networked] public Player Player { get; set; }
@@ -13,14 +15,15 @@ public class Character : NetworkBehaviour {
     public float maxHealth;
     [HideInInspector] public Handling handling;
     [SerializeField] Camera cam;
-    [SerializeField] GameObject ragdollPF;
+    [SerializeField] Ragdoll ragdollPF;
     [SerializeField] SpectatorCam deathCamPF;
     [SerializeField] SpectatorCam deathCam;
     [SerializeField] VolumeProfile normalProfile, spectatorProfile;
-    [SerializeField] GameObject ragdoll;
-    [SerializeField] Transform armature;
-    [SerializeField] Transform[] bones;
+    [SerializeField] BodyHitbox[] bones;
     [SerializeField] GameObject visuals;
+    [SerializeField] private float headshotDamageX;
+    [SerializeField] private float limbDamageX;
+    [SerializeField] private EventReference killSoumd;
     private Locomotion locomotion;
     private Controls controls;
     private UI UI;
@@ -34,6 +37,8 @@ public class Character : NetworkBehaviour {
         UI = GetComponent<UI>();
         rb = GetComponent<Rigidbody>();
         kcc = GetComponent<KCC>();
+        
+        for (int i = 0; i < bones.Length; i++) { bones[i].ID = i; }
     }
     private void OnEnable() { controls.Enable(); }
     private void OnDisable() { controls.Disable(); }
@@ -62,6 +67,7 @@ public class Character : NetworkBehaviour {
         Player.Character = this;
         Health = maxHealth;
         IsAlive = true;
+        
         if (Object.HasInputAuthority) {
             name = "Client";
             Cursor.lockState = CursorLockMode.Locked;
@@ -109,36 +115,60 @@ public class Character : NetworkBehaviour {
             Player.RespawnTimer = TickTimer.CreateFromSeconds(Runner, Player.respawnTime);
         }
         
-        if (transform.position.y <= -50) { Damage(new(Object.InputAuthority), 100); }
+        if (transform.position.y <= -50) { Damage(DamageSource.Suicide(Object.InputAuthority), 100); }
         if (GetInput(out NetworkInputData input)) {
-            if (input.buttons.WasPressed(LastInput.buttons, Buttons.Kill)) { Damage(new(Object.InputAuthority), 100); }
+            if (input.buttons.WasPressed(LastInput.buttons, Buttons.Kill)) { Damage(DamageSource.Suicide(Object.InputAuthority), 100); }
         }
     }
 
-    public void Damage(DamageSource source, float amount) {
+    public void Damage(DamageSource source, float amount, BodyPart part = BodyPart.Body) {
         dmgSource = source;
+        amount = part switch {
+            BodyPart.Head => amount * headshotDamageX,
+            BodyPart.Limb => amount * limbDamageX,
+            _ => amount,
+        };
         Health = Mathf.Clamp(Health - amount, 0, maxHealth);
     }
     
     public static void OnHealthChanged(Changed<Character> changed) {
         Character c = changed.Behaviour;
         c.UI.healthText.text = c.Health.ToString();
+        if (c.Runner.LocalPlayer == c.dmgSource.attacker) {
+            Character atk = GameManager.GetPlayer(c.dmgSource.attacker).Character;
+            atk.UI.MarkHit(c.bones[c.dmgSource.limb].part == BodyPart.Head);
+        }
     }
 
     public static void OnAliveChanged(Changed<Character> changed) {
         if (changed.Behaviour.IsAlive == false) {
             Character c = changed.Behaviour;
-            Transform[] rags = Instantiate(c.ragdollPF, c.transform).GetComponent<Ragdoll>().rags;
-            for (int i = 0; i < c.bones.Length; i++) { rags[i].localRotation = c.bones[i].localRotation; }
-            rags[0].GetComponent<Rigidbody>().AddForce(c.locomotion.kcc.Data.RealVelocity + c.dmgSource.hitNormal * c.dmgSource.hitForce);
             Character atk = GameManager.GetPlayer(c.dmgSource.attacker).Character;
-            atk.UI.IndicateKill(c.Player.name, c.dmgSource.weapon == -1 ? "self" : GameManager.GetWeapon(c.dmgSource.weapon).name, Mathf.Round(c.dmgSource.distance * 100f) / 100f);
-
+            
+            // Ragdoll
+            Rigidbody[] rags = Instantiate(c.ragdollPF, c.transform).rags;
+            for (int i = 0; i < c.bones.Length; i++) { rags[i].transform.localRotation = c.bones[i].transform.localRotation; }
+            rags[c.dmgSource.limb].AddForceAtPosition(c.dmgSource.hitVector, c.dmgSource.hitPos);
+            rags[0].GetComponent<Rigidbody>().AddForce(c.locomotion.kcc.Data.RealVelocity);
+            
+            // Points
+            List<PointsIndicator> subIndicators = new();
+            if(c.dmgSource.distance > 20) { subIndicators.Add(new(50, $"Distance bonus ({Mathf.Round(c.dmgSource.distance * 100f) / 100f})")); }
+            PointsManager.inst.AwardPoints(atk.Player, new PointsIndicator(100, $"Killed <color=#eb4034>{c.Player.Name}</color>"), subIndicators);
+                        
             if (c.Object.HasInputAuthority) {
                 c.deathCam = Instantiate(c.deathCamPF, atk.cam.transform.position + atk.cam.transform.TransformDirection(new Vector3(0, 0, -2)), atk.cam.transform.rotation);
                 c.deathCam.Initialize(atk);
                 if(c.dmgSource.attacker != c.Object.InputAuthority) { c.deathCam.target =  atk.cam.transform; }
                 GameManager.inst.SwitchCamera(c.deathCam.cam, c.spectatorProfile);
+            }
+            if (c.Runner.LocalPlayer == c.dmgSource.attacker) {
+                RuntimeManager.PlayOneShot(c.killSoumd);
+                EventInstance inst = RuntimeManager.CreateInstance(c.killSoumd);
+                inst.set3DAttributes(c.transform.To3DAttributes());
+                inst.setParameterByName("IsHeadshot", c.bones[c.dmgSource.limb].part == BodyPart.Head ? 1 : 0);
+                inst.start();
+                inst.release();
             }
         }
     }

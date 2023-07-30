@@ -6,7 +6,7 @@ using System.Linq;
 
 
 public class ProjectileManager : NetworkBehaviour {
-	public static ProjectileManager inst { get; set; }
+	public static ProjectileManager I { get; set; }
 	[HideInInspector] public ProjectileData[] projectileLibrary;
 	[Networked, Capacity(256)] private NetworkArray<Projectile> projectiles { get; }
 	[Networked] private int ProjectileIndex { get; set; }
@@ -17,7 +17,8 @@ public class ProjectileManager : NetworkBehaviour {
 	Queue<GameObject> impactPool = new();
 	
 	private void Awake() {
-		inst = this;
+		if(I) { Debug.LogError("Duplicate ProjectileManager found."); }
+		I = this;
 		projectileLibrary = Resources.LoadAll("ProjectileData").OfType<ProjectileData>().ToArray();
 	}
 

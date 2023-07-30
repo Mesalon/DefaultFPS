@@ -22,6 +22,13 @@ MonoBehaviour:
   ricochetDamping: 0
   penetration: 0
   impact: {fileID: 0}
+  shotSound:
+    Guid:
+      Data1: -1059733819
+      Data2: 1104506771
+      Data3: 94192043
+      Data4: -723840736
+    Path: event:/5.56x45
   showDebugTracers: 1
   debugTracerTime: 1
   debugTracerColor: {r: 1, g: 0, b: 0, a: 1}

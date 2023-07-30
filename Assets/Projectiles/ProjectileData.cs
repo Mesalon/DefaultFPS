@@ -1,4 +1,5 @@
 using UnityEngine;
+using FMODUnity;
 
 [CreateAssetMenu(fileName = "New Projectile", menuName = "Items/New Projectile")]
 public class ProjectileData : ScriptableObject {
@@ -12,7 +13,7 @@ public class ProjectileData : ScriptableObject {
 	public float ricochetDamping;
 	public float penetration;
 	public GameObject impact;
-
+	public EventReference shotSound;
 	[Header("Debug Settings")]
 	public bool showDebugTracers;
 	public float debugTracerTime; // Time it shows up. 0 for one frame.

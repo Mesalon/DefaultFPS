@@ -3,5 +3,5 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Ragdoll : MonoBehaviour {
-    public Transform[] rags;
+    public Rigidbody[] rags;
 }

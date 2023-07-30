@@ -18,9 +18,9 @@ public class Handling : NetworkBehaviour {
     public TwoBoneIK armIKL, armIKR;
     public Transform awayPose;
     [SerializeField] float posBob, rotBob;
-    [SerializeField] float minPoseTime, maxPoseTime;
-    [SerializeField] float minBobSpeed, maxBobSpeed;
-    [SerializeField] float minMoveSwayX = 1, maxMoveSwayX = 1;
+    [SerializeField] private WeightMap poseMap;
+    [SerializeField] private WeightMap bobSpeedMap;
+    [SerializeField] private WeightMap moveSwayMap;
     [SerializeField] float moveSwayRecoveryBaseX = 1;
     [SerializeField] float sprintFOVX = 1;
     [SerializeField] float sprintBobSpeedX = 1;
@@ -37,11 +37,11 @@ public class Handling : NetworkBehaviour {
     [SerializeField] Camera cam;
     private KCC kcc;
     private Locomotion locomotion;
-    private Vector2 lastLook;
+    private Vector3 lastLook;
     private Vector3 gunMoveSway;
     private Vector3 moveSwayDebt, lastMove;
     private Pose gunHandlePose, gunRecoilPose, gunBobPose;
-    private Quaternion gunLookSway;
+    private Pose gunLookSway;
     private float startFOV, bobSpeed, startPosBob, startRotBob;
     private float bobClock;
     private Vector3 velV1, velV2, velV3, velV4, velV5, velV6;
@@ -70,18 +70,7 @@ public class Handling : NetworkBehaviour {
         gunHandlePose = new(awayPose.localPosition, awayPose.localRotation);
     }
 
-    /*private void OnDrawGizmos() {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(head.TransformPoint(lastNetPose.position), 0.1f);
-        Gizmos.color = Color.blue;
-        Gizmos.DrawWireSphere(Gun.transform.position, 0.0999f);
-    }*/
-
     public override void FixedUpdateNetwork() {
-        /*lastNetPose = new(Gun.transform.localPosition, Gun.transform.localRotation);
-        Gun.visuals.transform.SetPositionAndRotation(head.TransformPoint(lastNetPose.position), head.rotation * Gun.transform.rotation);
-        interpClock = 0;*/
-
         if (GetInput(out NetworkInputData input)) {
             if (input.buttons.IsSet(Buttons.Aim)) { locomotion.CurrentMoveSpeed = Gun.stats.walkSpeed * 0.75f; }
             else if (input.buttons.IsSet(Buttons.Run)) { locomotion.CurrentMoveSpeed = Gun.stats.walkSpeed * 1.25f; }
@@ -102,12 +91,12 @@ public class Handling : NetworkBehaviour {
     public override void Render() {
         Pose gunPoseTarget = Gun.length == WeaponLength.TwoHand ? new(riflePose.localPosition, riflePose.localRotation) : new(pistolPose.localPosition, pistolPose.localRotation);
         locomotion.currentSensitivity = locomotion.sensitivity;
-        float poseTime = RemapWeight(Gun.stats.weight, minPoseTime, maxPoseTime);
-        float bobSpeedTarget = RemapWeight(Gun.stats.weight, minBobSpeed, maxBobSpeed);
+        float poseSpeed = Remap(Gun.stats.weight, poseMap);
+        float bobSpeedTarget = Remap(Gun.stats.weight, bobSpeedMap);
         float fovTarget = startFOV;
         float posBobTarget = startPosBob;
         float rotBobTarget = startRotBob;
-        float moveSway = RemapWeight(Gun.stats.weight, minMoveSwayX, maxMoveSwayX);
+        float moveSway = Remap(Gun.stats.weight, moveSwayMap);
         float moveSwayRecovery = moveSwayRecoveryBaseX;
 
         if (LastInput.buttons.IsSet(Buttons.Aim)) {
@@ -131,7 +120,7 @@ public class Handling : NetworkBehaviour {
         if (CurrentGunRole != NewGunRole) {
             Firearm newGun = NewGunRole == WeaponRole.Primary ? Gun1 : Gun2;
             gunPoseTarget = new(awayPose.localPosition, awayPose.localRotation);
-            poseTime = RemapWeight(newGun.stats.weight, 0.05f, 0.8f);
+            poseSpeed = Remap(newGun.stats.weight, poseMap);
             if ((Gun.transform.position - awayPose.position).magnitude < 0.05f) { // Done switching
                 gunHandlePose = new(awayPose.localPosition, awayPose.localRotation);
                 Gun.gameObject.SetActive(false);
@@ -145,9 +134,9 @@ public class Handling : NetworkBehaviour {
         }
         
         // Weapon bob
-        bobSpeed = Mathf.SmoothDamp(bobSpeed, bobSpeedTarget, ref vel4, poseTime);
-        posBob = Mathf.SmoothDamp(posBob, posBobTarget, ref vel5, poseTime);
-        rotBob = Mathf.SmoothDamp(rotBob, rotBobTarget, ref vel6, poseTime);
+        bobSpeed = Mathf.SmoothDamp(bobSpeed, bobSpeedTarget, ref vel4, poseSpeed);
+        posBob = Mathf.SmoothDamp(posBob, posBobTarget, ref vel5, poseSpeed);
+        rotBob = Mathf.SmoothDamp(rotBob, rotBobTarget, ref vel6, poseSpeed);
         Vector3 bobPosTarget = Vector3.zero;
         Quaternion bobRotTarget = Quaternion.identity;
         if (LastInput.movement == Vector2.zero) { bobClock = 0; }
@@ -166,9 +155,10 @@ public class Handling : NetworkBehaviour {
         gunMoveSway = Vector3.SmoothDamp(gunMoveSway, moveSwayDebt, ref velV4, 0.15f);
         
         // Look Sway
-        Quaternion lookSwayTarget = Quaternion.Euler(lookSwayFactor * -(kcc.RenderData.GetLookRotation(true, true) - lastLook)); 
-        gunLookSway = RotationSmoothDamp(gunLookSway, lookSwayTarget, ref velQ5, lookSwayRecovery); 
+        Vector3 lookSwayTarget = lookSwayFactor * -(head.rotation.eulerAngles - lastLook); 
+        gunLookSway.rotation = RotationSmoothDamp(gunLookSway.rotation, Quaternion.Euler(lookSwayTarget), ref velQ3, 1 / lookSwayRecovery);
         
+
         // Weapon Recoil 
         Vector2 appliedPosRecoil = currentPosRecoil * Gun.Recoil.posSpeed * Time.deltaTime;
         Vector2 appliedRotRecoil = currentRotRecoil * Gun.Recoil.rotSpeed * Time.deltaTime;
@@ -182,20 +172,15 @@ public class Handling : NetworkBehaviour {
         currentRotRecoil -= appliedRotRecoil;
         currentCamRecoil -= appliedCamRecoil;
 
-        cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, fovTarget, ref vel2, poseTime);
-        gunHandlePose.position = Vector3.SmoothDamp(gunHandlePose.position, gunPoseTarget.position, ref velV1, poseTime);
-        gunHandlePose.rotation = RotationSmoothDamp(gunHandlePose.rotation, gunPoseTarget.rotation, ref velQ1, poseTime);
-        
-        Gun.transform.localPosition = gunHandlePose.position + gunBobPose.position + gunRecoilPose.position;
-        Gun.transform.localRotation = gunHandlePose.rotation * gunBobPose.rotation * Quaternion.Euler(gunMoveSway) * gunLookSway * gunRecoilPose.rotation;
+        cam.fieldOfView = Mathf.SmoothDamp(cam.fieldOfView, fovTarget, ref vel2, poseSpeed);
+        gunHandlePose.position = Vector3.SmoothDamp(gunHandlePose.position, gunPoseTarget.position, ref velV1, poseSpeed);
+        gunHandlePose.rotation = RotationSmoothDamp(gunHandlePose.rotation, gunPoseTarget.rotation, ref velQ1, poseSpeed);
 
-        lastMove = new(LastInput.movement.x, kcc.FixedData.RealVelocity.y, LastInput.movement.y);
-        lastLook = kcc.RenderData.GetLookRotation(true, true);
+        Gun.transform.localPosition = gunHandlePose.position + gunBobPose.position + gunRecoilPose.position;
+        Gun.transform.localRotation = gunHandlePose.rotation * gunBobPose.rotation * Quaternion.Euler(gunMoveSway) * gunLookSway.rotation * gunRecoilPose.rotation;
         
-        // TODO: INTERPOLATE
-        /*interpClock += Time.deltaTime;
-        Gun.visuals.transform.position = Vector3.Lerp(head.TransformPoint(lastNetPose.position), Gun.transform.position, interpClock / Runner.DeltaTime);
-        Gun.visuals.transform.rotation = Quaternion.Lerp(head.rotation * lastNetPose.rotation, Gun.transform.rotation, interpClock / Runner.DeltaTime);*/
+        lastMove = new(LastInput.movement.x, kcc.FixedData.RealVelocity.y, LastInput.movement.y);
+        lastLook = head.rotation.eulerAngles;
     }
 
     private void LateUpdate() { // IK
@@ -231,7 +216,11 @@ public class Handling : NetworkBehaviour {
         return new Quaternion(Result.x, Result.y, Result.z, Result.w);
     }
     
-    public float RemapWeight(float weight, float min, float max) => Mathf.Lerp(min, max, Mathf.InverseLerp(0, 15, weight));
+    public float Remap(float n, WeightMap map) => Mathf.Lerp(map.newMin, map.newMax, Mathf.InverseLerp(map.min, map.max, n));
+    [Serializable] public struct WeightMap {
+        public float min, max;
+        public float newMin, newMax;
+    }
     
     private static void InitPrimary(Changed<Handling> changed) {
         Transform t = changed.Behaviour.Gun1.transform;
