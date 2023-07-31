@@ -4,15 +4,17 @@ using Fusion;
 using Fusion.KCC;
 using UnityEngine;
 using FMOD.Studio;
+
 [OrderBefore(typeof(KCC), typeof(Character), typeof(Handling), typeof(Firearm))]
 public class Locomotion : NetworkKCCProcessor {
     [HideInInspector, Networked] public float CurrentMoveSpeed { get; set; }
     [Networked] NetworkInputData LastInput { get; set; }
+    [Networked] private Vector2 Look { get; set; }
 
     public KCC kcc;
     [HideInInspector] public float sensitivity;
     [HideInInspector] public float currentSensitivity;
-    [HideInInspector] public Vector2 localLook;
+    [HideInInspector] public Vector2 look;
     [SerializeField] EventReference footsteps;
     [SerializeField] Transform abdomen, chest, head;
     [SerializeField] float jumpForce;
@@ -34,44 +36,37 @@ public class Locomotion : NetworkKCCProcessor {
 
     public override void FixedUpdateNetwork() {
         if (GetInput(out NetworkInputData input)) {
-            Vector3 inputDirection = kcc.Data.TransformRotation * new Vector3(input.movement.x, 0, input.movement.y);
+            Vector3 inputDirection = transform.rotation * new Vector3(input.movement.x, 0, input.movement.y);
             kcc.Data.KinematicSpeed = CurrentMoveSpeed; 
             kcc.SetInputDirection(inputDirection);
             if (input.buttons.WasPressed(LastInput.buttons, Buttons.Jump)) { kcc.Jump(Vector3.up * jumpForce); }
+            Look = input.look;
             LastInput = input;
         }
 
-        UpdateLook(input.lookDelta);
+        if (!HasInputAuthority) {
+            UpdateLook(look);
+        }
     }
 
     public override void Render() {
         // Look
         if (HasInputAuthority) {
             Vector2 input = controls.Player.Look.ReadValue<Vector2>();
-            localLook += new Vector2(-input.y, input.x) * currentSensitivity;
-            UpdateLook(localLook);
-        }
-
-        RuntimeManager.AttachInstanceToGameObject(footstepInst, transform);
-        if (kcc.Data.RealVelocity != Vector3.zero && kcc.Data.IsGrounded) {
-            footstepInst.getPlaybackState(out PLAYBACK_STATE state);
-            if (state == PLAYBACK_STATE.STOPPED) { footstepInst.start(); }
-        }
-        else {
-            footstepInst.stop(STOP_MODE.ALLOWFADEOUT);
+            look = new Vector2(Mathf.Clamp(look.x - input.y * currentSensitivity, -90, 90), look.y + input.x * currentSensitivity);
+            UpdateLook(look);
         }
     }
 
-    private void UpdateLook(Vector2 lookDelta) {
-        Vector2 look = kcc.FixedData.GetLookRotation(true, true);
-        kcc.SetLookRotation(look + lookDelta);
-        float pitch = kcc.RenderData.GetLookRotation(true, true).x;
-        
+    private void UpdateLook(Vector2 input) {
+        look = input;
         abdomen.localRotation = startAbdomenRot;
         chest.localRotation = startChestRot;
         head.localRotation = startHeadRot;
-        abdomen.RotateAround(abdomen.position, transform.right, pitch * 0.3f);
-        chest.RotateAround(chest.position, transform.right, pitch * 0.3f);
-        head.RotateAround(head.position, transform.right, pitch * 0.4f);
+        abdomen.RotateAround(abdomen.position, transform.right, look.x * 0.3f);
+        chest.RotateAround(chest.position, transform.right, look.x * 0.3f);
+        head.RotateAround(head.position, transform.right, look.x * 0.4f);
+        transform.rotation = Quaternion.Euler(0, input.y, 0);
+        kcc.SetLookRotation(0, input.y);
     }
 }

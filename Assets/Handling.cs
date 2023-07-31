@@ -165,7 +165,7 @@ public class Handling : NetworkBehaviour {
         Vector2 appliedCamRecoil = currentCamRecoil * Gun.Recoil.camSpeed * Time.deltaTime;
         gunRecoilPose.position += new Vector3(0, 0, appliedPosRecoil.x);
         gunRecoilPose.rotation *= Quaternion.Euler(appliedRotRecoil.x, appliedRotRecoil.y, 0);
-        locomotion.localLook += appliedCamRecoil;
+        locomotion.look += appliedCamRecoil;
         gunRecoilPose.position = Vector3.Slerp(gunRecoilPose.position, Vector3.zero, Gun.Recoil.posRecovery * Time.deltaTime);
         gunRecoilPose.rotation = Quaternion.Slerp(gunRecoilPose.rotation, Quaternion.identity, Gun.Recoil.rotRecovery * Time.deltaTime);
         currentPosRecoil -= appliedPosRecoil;

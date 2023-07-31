@@ -71,14 +71,14 @@
     "NetworkConditions": {
         "Enabled": true,
         "DelayShape": 1,
-        "DelayMin": 0.5,
-        "DelayMax": 0.5,
+        "DelayMin": 0.4,
+        "DelayMax": 0.4,
         "DelayPeriod": 3.0,
         "DelayThreshold": 0.5,
         "AdditionalJitter": 0.01,
         "LossChanceShape": 1,
-        "LossChanceMin": 0.0,
-        "LossChanceMax": 0.02,
+        "LossChanceMin": 0.05,
+        "LossChanceMax": 0.05,
         "LossChanceThreshold": 0.9,
         "LossChancePeriod": 3.0,
         "AdditionalLoss": 0.005
