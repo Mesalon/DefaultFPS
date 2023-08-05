@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 72e13a789e1cbe047955b30fde875197
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 244488
+  packageName: Aerosol
+  packageVersion: 1.0
+  assetPath: Assets/Plugins/Aerosol/README.md
+  uploadId: 559034

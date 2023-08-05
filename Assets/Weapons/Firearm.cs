@@ -55,7 +55,7 @@ public class Firearm : NetworkBehaviour {
     }
 
     private void Start() {
-        ProjectileData[] library = ProjectileManager.I.projectileLibrary;
+        ProjectileData[] library = ProjectileManager.Inst.projectileLibrary;
         for (int i = 0; i < library.Length; i++) {
             if (library[i].name == stats.projectile.name) {
                 projectileIndex = i;
@@ -80,7 +80,7 @@ public class Firearm : NetworkBehaviour {
                     UnityEngine.Random.InitState(Runner.Tick);
                     RecoilYaw = Mathf.Clamp(Mathf.Lerp(UnityEngine.Random.Range(Recoil.minRecoilX, Recoil.maxRecoilX), RecoilYaw, Recoil.stability), Recoil.minRecoilX, Recoil.maxRecoilX);
                     FireTimer = TickTimer.CreateFromSeconds(Runner, 1 / (stats.cyclicRate / 60));
-                    ProjectileManager.I.CreateProjectile(new(projectileIndex, Object.InputAuthority, input.muzzlePos, input.muzzleDir, Runner.Tick, 4, Runner));
+                    ProjectileManager.Inst.CreateProjectile(new(projectileIndex, Object.InputAuthority, input.muzzlePos, input.muzzleDir, Runner.Tick, 4, Runner));
                 }
             }
             else { DisconnectorState = false; }
@@ -99,7 +99,7 @@ public class Firearm : NetworkBehaviour {
     public static void OnFire(Changed<Firearm> changed) {
         Firearm f = changed.Behaviour;
         if (f.Runner.IsForward) {
-            RuntimeManager.PlayOneShot(ProjectileManager.I.projectileLibrary[f.projectileIndex].shotSound, f.muzzlePoint.position);
+            RuntimeManager.PlayOneShot(ProjectileManager.Inst.projectileLibrary[f.projectileIndex].shotSound, f.muzzlePoint.position);
             f.muzzleFlash.pause = false;
             f.muzzleFlash.playRate = 0.01f;
             f.muzzleFlash.Play();

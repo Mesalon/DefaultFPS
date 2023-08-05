@@ -55,9 +55,10 @@ MonoBehaviour:
   _team: 0
   _Kills: 0
   _Deaths: 0
+  _Score: 0
   _Character: {fileID: 0}
   respawnTime: 4
-  characterPF: {fileID: 6523042883888669111, guid: 93c56d1fd17104be29d7ea939e0bac0a,
+  characterPF: {fileID: 6523042883888669111, guid: eb23b189824e625ceb464ccc3ab1ae9c,
     type: 3}
 --- !u!114 &1139018457521385856
 MonoBehaviour:

@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: c4e20965f3560ca46862a4aa6ec3ad42
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 244488
+  packageName: Aerosol
+  packageVersion: 1.0
+  assetPath: Assets/Plugins/Aerosol/Scripts/Model.cs
+  uploadId: 559034

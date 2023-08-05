@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 862b9d459b0546440bd37472395b1125
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures: []
+  nonModifiableTextures: []
+  preprocessorOverride: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 244488
+  packageName: Aerosol
+  packageVersion: 1.0
+  assetPath: Assets/Plugins/Aerosol/Shaders/definitions.hlsl
+  uploadId: 559034

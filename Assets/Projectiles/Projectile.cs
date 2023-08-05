@@ -2,7 +2,7 @@ using UnityEngine;
 using Fusion;
 
 public struct Projectile : INetworkStruct {
-    private NetworkRunner Runner => ProjectileManager.I.Runner;
+    private NetworkRunner Runner => ProjectileManager.Inst.Runner;
     public bool isActive;
     public int dataIndex;
     public PlayerRef owner;
@@ -38,13 +38,13 @@ public struct Projectile : INetworkStruct {
         var lastPosition = GetMovePosition(Runner.Tick - 1f);
         var position = GetMovePosition(Runner.Tick);
 
-        ProjectileData data = ProjectileManager.I.projectileLibrary[dataIndex];
+        ProjectileData data = ProjectileManager.Inst.projectileLibrary[dataIndex];
         if (data.showDebugTracers) {
             float time = data.debugTracerTime == 0 ? Time.deltaTime : data.debugTracerTime;
             Debug.DrawRay(lastPosition, position - lastPosition, data.debugTracerColor, time);
         }
         
-        if (Runner.LagCompensation.Raycast(lastPosition, position - lastPosition, Vector3.Distance(position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority, layerMask: ProjectileManager.I.projectileMask)) {
+        if (Runner.LagCompensation.Raycast(lastPosition, position - lastPosition, Vector3.Distance(position, lastPosition), owner, out LagCompensatedHit hit, options: HitOptions.IncludePhysX | HitOptions.IgnoreInputAuthority, layerMask: ProjectileManager.Inst.projectileMask)) {
             hitPosition = hit.Point;
             destroyProjectile = true;
             if (hit.Hitbox is BodyHitbox box) {
@@ -60,14 +60,14 @@ public struct Projectile : INetworkStruct {
     }
         
     public void DrawProjectile(int tick) {
-        ProjectileData data = ProjectileManager.I.projectileLibrary[dataIndex];
+        ProjectileData data = ProjectileManager.Inst.projectileLibrary[dataIndex];
         Graphics.DrawMesh(data.tracerMesh, Matrix4x4.TRS(GetMovePosition(tick), Quaternion.LookRotation(direction), Vector3.one * 5), data.tracerMat, 0);
     }
     
     public Vector3 GetMovePosition(float tick) {
         float time = (tick - fireTick) * Runner.DeltaTime;
         if (time <= 0f) { return firePosition; }
-        return firePosition + (direction * ProjectileManager.I.projectileLibrary[dataIndex].speed + Physics.gravity * time) * time;
+        return firePosition + (direction * ProjectileManager.Inst.projectileLibrary[dataIndex].speed + Physics.gravity * time) * time;
     }
 }
 

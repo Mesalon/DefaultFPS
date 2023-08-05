@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: b3f5fb0481e56b24dbba49f86a80b7a8
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 244488
+  packageName: Aerosol
+  packageVersion: 1.0
+  assetPath: Assets/Plugins/Aerosol/LICENSE.txt
+  uploadId: 559034

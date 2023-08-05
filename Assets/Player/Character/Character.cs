@@ -175,7 +175,5 @@ public class Character : NetworkBehaviour {
     }
 }
 
-/*anim.SetFloat("MoveX", LastInput.movement.x, 0.1f, Time.deltaTime);
-anim.SetFloat("MoveZ", LastInput.movement.y, 0.1f, Time.deltaTime);
-anim.SetFloat("Aim", LastInput.buttons.IsSet(Buttons.Aim) ? 1 : 0, 0.1f, Time.deltaTime);*/
+
 // todo troll: In Unity disc on alt - Ask to help model a sine wave in Unity, pretending to not know what a sine wave is called and show a video of a stream of my piss moving up and down as an example
