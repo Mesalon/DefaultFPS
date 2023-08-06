@@ -1,7 +1,9 @@
+using System;
+using FMODUnity;
 using Fusion;
 using Fusion.KCC;
 using UnityEngine;
-
+using FMOD.Studio;
 [OrderBefore(typeof(KCC), typeof(Character), typeof(Handling), typeof(Firearm))]
 public class Locomotion : NetworkKCCProcessor {
     [HideInInspector, Networked] public float CurrentMoveSpeed { get; set; }
@@ -11,14 +13,15 @@ public class Locomotion : NetworkKCCProcessor {
     [HideInInspector] public float sensitivity;
     [HideInInspector] public float currentSensitivity;
     [HideInInspector] public Vector2 localLook;
-    public Animator anim;
+    [SerializeField] EventReference footsteps;
     [SerializeField] Transform abdomen, chest, head;
-    [SerializeField] private float ADSSpeed, sprintSpeed;
     [SerializeField] float jumpForce;
+    [SerializeField] float ADSSpeed, sprintSpeed;
     private Controls controls;
     private Handling handling;
-    private Quaternion startAbdomenRot, startChestRot, startHeadRot; 
-    
+    private EventInstance footstepInst;
+    private Quaternion startAbdomenRot, startChestRot, startHeadRot;
+
     protected void Awake() {
         handling = GetComponent<Handling>();
         kcc = GetComponent<KCC>();
@@ -26,6 +29,7 @@ public class Locomotion : NetworkKCCProcessor {
         startChestRot = chest.localRotation;
         startHeadRot = head.localRotation;
         controls = new();
+        footstepInst = AudioManager.inst.CreateInstance(footsteps, transform);
     }
 
     private void OnEnable() { controls.Enable(); }
@@ -37,13 +41,15 @@ public class Locomotion : NetworkKCCProcessor {
             else if (input.buttons.IsSet(Buttons.Run)) { CurrentMoveSpeed = handling.Gun.stats.walkSpeed * sprintSpeed; }
             else { CurrentMoveSpeed = handling.Gun.stats.walkSpeed; }
             kcc.FixedData.speed = CurrentMoveSpeed;
+            
             Vector3 inputDirection = kcc.Data.TransformRotation * new Vector3(input.movement.x, 0, input.movement.y);
+            kcc.Data.KinematicSpeed = CurrentMoveSpeed; 
             kcc.SetInputDirection(inputDirection);
             if (input.buttons.WasPressed(LastInput.buttons, Buttons.Jump)) { kcc.Jump(Vector3.up * jumpForce); }
-            
             LastInput = input;
         }
-        
+
+        print(input.lookDelta);
         UpdateLook(input.lookDelta);
     }
 
@@ -54,15 +60,21 @@ public class Locomotion : NetworkKCCProcessor {
             localLook += new Vector2(-input.y, input.x) * currentSensitivity;
             UpdateLook(localLook);
         }
-        
-        anim.SetFloat("MoveX", LastInput.movement.x, 0.1f, Time.deltaTime);
-        anim.SetFloat("MoveZ", LastInput.movement.y, 0.1f, Time.deltaTime);
+
+        RuntimeManager.AttachInstanceToGameObject(footstepInst, transform);
+        if (kcc.Data.RealVelocity != Vector3.zero && kcc.Data.IsGrounded) {
+            footstepInst.getPlaybackState(out PLAYBACK_STATE state);
+            if (state == PLAYBACK_STATE.STOPPED) { footstepInst.start(); }
+        }
+        else {
+            footstepInst.stop(STOP_MODE.ALLOWFADEOUT);
+        }
     }
 
     private void UpdateLook(Vector2 lookDelta) {
         Vector2 look = kcc.FixedData.GetLookRotation(true, true);
         kcc.SetLookRotation(look + lookDelta);
-        float pitch = kcc.RenderData.GetLookRotation(true, true).x;
+        float pitch = kcc.RenderData.GetLookRotation(true, false).x;
         
         abdomen.localRotation = startAbdomenRot;
         chest.localRotation = startChestRot;

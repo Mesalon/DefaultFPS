@@ -7,7 +7,6 @@ using System.Linq;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Rendering;
-using UnityEngine.Serialization;
 
 public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	public static Player GetPlayer(PlayerRef player) => inst.Runner.GetPlayerObject(player).GetComponent<Player>();

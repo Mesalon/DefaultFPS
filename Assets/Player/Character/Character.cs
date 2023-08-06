@@ -141,7 +141,6 @@ public class Character : NetworkBehaviour {
             Character atk = GameManager.GetPlayer(c.DmgSource.attacker).Character;
             
             c.locomotion.enabled = false;
-            c.locomotion.anim.enabled = false;
             c.handling.enabled = false; 
             c.UI.enabled = false;
             c.rb.detectCollisions = false;

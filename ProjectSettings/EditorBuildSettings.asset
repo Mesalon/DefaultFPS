@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Cargo.unity
+    guid: ea5a0ee2035d6fb1495861a25cddf5a4
+  - enabled: 1
     path: Assets/Scenes/Combat.unity
     guid: 473dbf6d961fb8b8da74c74de640cc1d
   m_configObjects: {}

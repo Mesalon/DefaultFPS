@@ -112,7 +112,7 @@ public class Firearm : NetworkBehaviour {
     }
     
     public static void ReloadFX(Changed<Firearm> changed) {
-        changed.Behaviour.audio.PlayOneShot(changed.Behaviour.reloadSound);
+        
     }
 }
 
