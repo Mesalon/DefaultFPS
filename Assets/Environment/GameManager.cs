@@ -5,6 +5,7 @@ using Fusion;
 using System;
 using System.Linq;
 using TMPro;
+using UnityEngine.UI;
 using UnityEngine.Rendering;
 using UnityEngine.Serialization;
 
@@ -26,6 +27,7 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 	public Camera mainCamera;
 	public Camera activeCamera;
 	public VolumeProfile menuProfile;
+	public RawImage teamColourIndicator;
 	private static List<Transform> spawns = new();
 	[SerializeField] private PlayerSetup loadouts;
 	[SerializeField] private TMP_InputField nameField;
@@ -53,7 +55,7 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 			GetPlayer(Runner.LocalPlayer).RPC_SetName(input);
 			nameField.text = "";
 		});
-		
+
 		SwitchCamera(mainCamera, menuProfile);
 	}
 
@@ -72,6 +74,8 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 			NetworkObject playerObject = runner.Spawn(playerPF, Vector3.zero, Quaternion.identity, player);
 			Runner.SetPlayerObject(player, playerObject);
 		}
+		if (LocalPlayer.team == Team.Red) { teamColourIndicator.color = Color.red; } 
+		else { teamColourIndicator.color = Color.blue; }
 	}
 
 	public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {
@@ -102,6 +106,11 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		activeCamera = cam;
 		if (postFX) { postProcessing.profile = postFX; }
 	}
+
+	public void SwitchTeams() {
+		if(LocalPlayer.team == Team.Red) { LocalPlayer.team = Team.Blue; teamColourIndicator.color = Color.blue; } 
+		else { LocalPlayer.team = Team.Red; teamColourIndicator.color = Color.red; }
+    }
 
 	#region stubs
 	public void OnInput(NetworkRunner runner, NetworkInput input) { }
