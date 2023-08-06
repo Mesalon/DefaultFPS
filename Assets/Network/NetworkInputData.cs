@@ -8,6 +8,6 @@ enum Buttons {
 public struct NetworkInputData : INetworkInput {
 	public NetworkButtons buttons;
 	public Vector2 movement;
-	public Vector2 look;
+	public Vector2 lookDelta;
 	public Vector3 muzzlePos, muzzleDir;
 }

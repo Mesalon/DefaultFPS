@@ -54,8 +54,9 @@ public class Character : NetworkBehaviour {
         data.buttons.Set(Buttons.Weapon1, controls.Player.Primary.ReadValue<float>() == 1);
         data.buttons.Set(Buttons.Weapon2, controls.Player.Secondary.ReadValue<float>() == 1);
         data.movement = controls.Player.Move.ReadValue<Vector2>();
-        data.look = locomotion.look;
-        if (Object && Object.IsValid) {
+        data.lookDelta = locomotion.localLook;
+        locomotion.localLook = Vector2.zero; // Consume that mother fucker
+        if (handling.Gun && handling.Gun.Object.IsValid) {
             data.muzzlePos = handling.Gun.muzzlePoint.position;
             data.muzzleDir = handling.Gun.muzzlePoint.forward;
         }
@@ -140,6 +141,7 @@ public class Character : NetworkBehaviour {
             Character atk = GameManager.GetPlayer(c.DmgSource.attacker).Character;
             
             c.locomotion.enabled = false;
+            c.locomotion.anim.enabled = false;
             c.handling.enabled = false; 
             c.UI.enabled = false;
             c.rb.detectCollisions = false;
@@ -148,12 +150,15 @@ public class Character : NetworkBehaviour {
 
             // Ragdoll
             Rigidbody[] rags = Instantiate(c.ragdollPF, c.transform).rags;
-            for (int i = 0; i < c.bones.Length; i++) { rags[i].transform.localRotation = c.bones[i].transform.localRotation; }
-            rags[c.DmgSource.limb].AddForceAtPosition(c.DmgSource.hitVector, c.DmgSource.hitPos);
-            rags[0].GetComponent<Rigidbody>().AddForce(c.locomotion.kcc.Data.RealVelocity);
+            
+            for (int i = 0; i < c.bones.Length; i++) { rags[i].transform.rotation = c.bones[i].transform.rotation; }
+            rags[c.DmgSource.limb].AddForceAtPosition(c.DmgSource.hitVector * 20, c.DmgSource.hitPos);
+            rags[0].GetComponent<Rigidbody>().velocity = c.locomotion.kcc.Data.RealVelocity;
             
             // Points
+            bool isHeadshot = c.bones[c.DmgSource.limb].part == BodyPart.Head;
             List<PointsIndicator> subIndicators = new();
+            if(isHeadshot) { subIndicators.Add(new(50, "Headshot bonus")); }
             if(c.DmgSource.distance > 20) { subIndicators.Add(new(50, $"Distance bonus ({Mathf.Round(c.DmgSource.distance * 100f) / 100f})")); }
             PointsManager.inst.AwardPoints(atk.Player, new PointsIndicator(100, $"Killed <color=#eb4034>{c.Player.Name}</color>"), subIndicators);
                         
@@ -167,7 +172,7 @@ public class Character : NetworkBehaviour {
                 RuntimeManager.PlayOneShot(c.killSoumd);
                 EventInstance inst = RuntimeManager.CreateInstance(c.killSoumd);
                 inst.set3DAttributes(c.transform.To3DAttributes());
-                inst.setParameterByName("IsHeadshot", c.bones[c.DmgSource.limb].part == BodyPart.Head ? 1 : 0);
+                inst.setParameterByName("IsHeadshot", isHeadshot ? 1 : 0);
                 inst.start();
                 inst.release();
             }
