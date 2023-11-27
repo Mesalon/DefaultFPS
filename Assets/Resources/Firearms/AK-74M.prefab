@@ -3553,9 +3553,9 @@ MonoBehaviour:
     camSpeed: 35
     posSpeed: 50
     rotSpeed: 20
-    posRecovery: 50
-    rotRecovery: 25
-    recoilY: 2.5
+    posRecovery: 40
+    rotRecovery: 20
+    recoilY: 2
     minRecoilX: -1.5
     maxRecoilX: 2
     stability: 0.8

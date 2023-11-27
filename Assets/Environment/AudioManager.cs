@@ -13,10 +13,6 @@ public class AudioManager : MonoBehaviour {
         if(inst) { Debug.LogError("Duplicate AudioManager found."); }
         inst = this;
     }
-
-    public void PlayOneShot(EventReference sound, Vector2 postion) {
-        RuntimeManager.PlayOneShot(sound, postion);
-    }
     
     public EventInstance CreateInstance(EventReference sound, Transform where = null) {
         EventInstance instance = RuntimeManager.CreateInstance(sound);  

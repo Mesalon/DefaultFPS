@@ -1,10 +1,6 @@
 namespace Fusion.KCC
 {
 	using UnityEngine;
-
-	public partial class KCCData {
-		public float speed;
-	}
 	
 	/// <summary>
 	/// Main data structure used for movement calculations. Stores data which require rollback, network synchronization + various metadata.

@@ -58,6 +58,10 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 		SwitchCamera(mainCamera, menuProfile);
 	}
 
+	private void Update() {
+		if(Input.GetKeyDown(KeyCode.Space) && !LocalPlayer.Character) { SpawnCharacterHook(); }
+	}
+
 	public override void Spawned() {
 		Runner.AddCallbacks(this);
 	}
@@ -73,8 +77,8 @@ public class GameManager : NetworkBehaviour, INetworkRunnerCallbacks {
 			NetworkObject playerObject = runner.Spawn(playerPF, Vector3.zero, Quaternion.identity, player);
 			Runner.SetPlayerObject(player, playerObject);
 		}
-		if (LocalPlayer.team == Team.Red) { teamColourIndicator.color = Color.red; } 
-		else { teamColourIndicator.color = Color.blue; }
+		/*if (LocalPlayer.team == Team.Red) { teamColourIndicator.color = Color.red; } 
+		else { teamColourIndicator.color = Color.blue; }*/
 	}
 
 	public void OnPlayerLeft(NetworkRunner runner, PlayerRef player) {

@@ -15,7 +15,7 @@ MonoBehaviour:
   tracerMesh: {fileID: 4300000, guid: 3eb0c8c8f87208765a50527cf0b6c999, type: 2}
   tracerMat: {fileID: 2100000, guid: f5dec08d9dbaf4228aeeb0309d0b675b, type: 2}
   speed: 915
-  damage: 26
+  damage: 30
   canRicochet: 0
   maxRicochetAngle: 0
   ricochetThreshold: 0

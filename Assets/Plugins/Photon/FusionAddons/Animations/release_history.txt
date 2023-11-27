@@ -1,0 +1,11 @@
+Photon Fusion Animation Controller Addon - Release History
+
+Last tested with Fusion SDK 1.1.6 Build 696
+
+Version 1.1.1
+- Added layer/state lookup by name.
+- State search switched from Depth-First Search to Breadth-First Search.
+- Compatibility with Fusion SDK 1.1.6 Build 696
+
+Version 1.1.0
+- Initial release.

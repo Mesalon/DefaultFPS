@@ -107,7 +107,7 @@ public class Firearm : NetworkBehaviour {
             Vector2 finalRecoil = new(-f.Recoil.recoilY, f.RecoilYaw);
             f.Owner.handling.currentCamRecoil += finalRecoil;
             f.Owner.handling.currentPosRecoil += finalRecoil * f.Recoil.posRecoilMult;
-            f.Owner.handling.currentRotRecoil += finalRecoil * f.Recoil.rotRecoilMult;
+            f.Owner.handling.currentRotRecoil += finalRecoil * f.Recoil.rotRecoilMult;  
         }
     }
     

@@ -254,7 +254,7 @@ MonoBehaviour:
     aimPoint: {fileID: 6304018884707898955}
     recoilMods: []
     classification: 0
-    walkSpeed: 4.2
+    walkSpeed: 3.5
     isFullAuto: 1
     cyclicRate: 600
     reloadTime: 2

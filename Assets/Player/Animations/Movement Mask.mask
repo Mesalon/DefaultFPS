@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!319 &31900000
+AvatarMask:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Movement Mask
+  m_Mask: 01000000000000000000000001000000010000000000000000000000000000000000000001000000010000000000000000000000
+  m_Elements:
+  - m_Path: 
+    m_Weight: 1
+  - m_Path: Armature
+    m_Weight: 0
+  - m_Path: Armature/Arm IK Pole.L
+    m_Weight: 0
+  - m_Path: Armature/Arm IK Pole.L/Arm IK Pole.L_end
+    m_Weight: 0
+  - m_Path: Armature/Arm IK Pole.R
+    m_Weight: 0
+  - m_Path: Armature/Arm IK Pole.R/Arm IK Pole.R_end
+    m_Weight: 0
+  - m_Path: Armature/Arm IK Target.L
+    m_Weight: 0
+  - m_Path: Armature/Arm IK Target.L/Arm IK Target.L_end
+    m_Weight: 0
+  - m_Path: Armature/Arm IK Target.R
+    m_Weight: 0
+  - m_Path: Armature/Arm IK Target.R/Arm IK Target.R_end
+    m_Weight: 0
+  - m_Path: Armature/Leg IK Pole.L
+    m_Weight: 0
+  - m_Path: Armature/Leg IK Pole.L/Leg IK Pole.L_end
+    m_Weight: 0
+  - m_Path: Armature/Leg IK Pole.R
+    m_Weight: 0
+  - m_Path: Armature/Leg IK Pole.R/Leg IK Pole.R_end
+    m_Weight: 0
+  - m_Path: Armature/Leg IK Target.L
+    m_Weight: 0
+  - m_Path: Armature/Leg IK Target.L/Leg IK Target.L_end
+    m_Weight: 0
+  - m_Path: Armature/Leg IK Target.R
+    m_Weight: 0
+  - m_Path: Armature/Leg IK Target.R/Leg IK Target.R_end
+    m_Weight: 0
+  - m_Path: Armature/Stomach
+    m_Weight: 1
+  - m_Path: Armature/Stomach/Abdomen
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Head
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Head/Head_end
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.L
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.L/Lower Arm.L
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.L/Lower Arm.L/Hand.L
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.L/Lower Arm.L/Hand.L/Upper Fingers.L
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.L/Lower Arm.L/Hand.L/Upper Fingers.L/Lower
+      Fingers.L
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.L/Lower Arm.L/Hand.L/Upper Fingers.L/Lower
+      Fingers.L/Lower Fingers.L_end
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.L/Lower Arm.L/Hand.L/Upper Thumb.L
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.L/Lower Arm.L/Hand.L/Upper Thumb.L/Lower
+      Thumb.L
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.L/Lower Arm.L/Hand.L/Upper Thumb.L/Lower
+      Thumb.L/Lower Thumb.L_end
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.R
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.R/Lower Arm.R
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.R/Lower Arm.R/Hand.R
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.R/Lower Arm.R/Hand.R/Upper Fingers.R
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.R/Lower Arm.R/Hand.R/Upper Fingers.R/Lower
+      Fingers.R
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.R/Lower Arm.R/Hand.R/Upper Fingers.R/Lower
+      Fingers.R/Lower Fingers.R_end
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.R/Lower Arm.R/Hand.R/Upper Thumb.R
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.R/Lower Arm.R/Hand.R/Upper Thumb.R/Lower
+      Thumb.R
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Abdomen/Chest/Upper Arm.R/Lower Arm.R/Hand.R/Upper Thumb.R/Lower
+      Thumb.R/Lower Thumb.R_end
+    m_Weight: 0
+  - m_Path: Armature/Stomach/Upper Leg.L
+    m_Weight: 1
+  - m_Path: Armature/Stomach/Upper Leg.L/Lower Leg.L
+    m_Weight: 1
+  - m_Path: Armature/Stomach/Upper Leg.L/Lower Leg.L/Foot.L
+    m_Weight: 1
+  - m_Path: Armature/Stomach/Upper Leg.L/Lower Leg.L/Foot.L/Foot.L_end
+    m_Weight: 1
+  - m_Path: Armature/Stomach/Upper Leg.R
+    m_Weight: 1
+  - m_Path: Armature/Stomach/Upper Leg.R/Lower Leg.R
+    m_Weight: 1
+  - m_Path: Armature/Stomach/Upper Leg.R/Lower Leg.R/Foot.R
+    m_Weight: 1
+  - m_Path: Armature/Stomach/Upper Leg.R/Lower Leg.R/Foot.R/Foot.R_end
+    m_Weight: 1
+  - m_Path: Armature/Stomach Target
+    m_Weight: 0
+  - m_Path: Armature/Stomach Target/Stomach Target_end
+    m_Weight: 0
+  - m_Path: Body
+    m_Weight: 0
